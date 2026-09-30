@@ -189,7 +189,6 @@
             <INDEXES>
                 <INDEX NAME="tenanttime_ix" UNIQUE="false" FIELDS="tenantid, timecreated"/>
                 <INDEX NAME="usertime_ix" UNIQUE="false" FIELDS="userid, timecreated"/>
-                <INDEX NAME="bridgemodel_ix" UNIQUE="false" FIELDS="bridge, model"/>
             </INDEXES>
         </TABLE>
         <TABLE NAME="local_ai_bridge_credit" COMMENT="Tenant credit ledger">
