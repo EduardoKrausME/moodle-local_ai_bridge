@@ -5,7 +5,7 @@ on:
     branches:
       - validate-ai-bridge
     paths:
-      - '.bootstrap/part12'
+      - '.bootstrap/part*'
 
 permissions:
   contents: write
