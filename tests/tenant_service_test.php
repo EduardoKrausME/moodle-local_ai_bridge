@@ -33,6 +33,7 @@ final class tenant_service_test extends advanced_testcase {
     /**
      * Method test_profile_conditions.
      *
+     * @covers \local_ai_bridge\tenant_service::profile_conditions
      * @return void Return value.
      */
     public function test_profile_conditions(): void {

@@ -76,14 +76,22 @@ echo $OUTPUT->header();
 if (count($tenants) > 1) {
     $menu = [];
     foreach ($tenants as $item) {
-        $menu[(new moodle_url('/local/ai_bridge/manage.php', ['tenantid' => $item->id, 'tab' => $tab]))->out(false)] = format_string($item->name);
+        $url = new moodle_url(
+            '/local/ai_bridge/manage.php',
+            ['tenantid' => $item->id, 'tab' => $tab]
+        );
+        $menu[$url->out(false)] = format_string($item->name);
     }
     echo $OUTPUT->single_select(new moodle_url('/local/ai_bridge/manage.php'), 'tenantid',
         array_map(fn($t) => format_string($t->name), $tenants), $tenantid, null, 'tenant-switch');
 }
 echo $OUTPUT->heading(format_string($tenant->name), 2);
 if (has_capability('local/ai_bridge:managetenants', $context)) {
-    echo html_writer::link(new moodle_url('/local/ai_bridge/tenant.php'), get_string('addtenant', 'local_ai_bridge'), ['class' => 'btn btn-secondary mb-3']);
+    echo html_writer::link(
+        new moodle_url('/local/ai_bridge/tenant.php'),
+        get_string('addtenant', 'local_ai_bridge'),
+        ['class' => 'btn btn-secondary mb-3']
+    );
 }
 echo $OUTPUT->tabtree($tabs, $tab);
 

@@ -40,13 +40,20 @@ class response {
      * @param array $metadata Parameter metadata.
      */
     public function __construct(
+        /** @var string Response text. */
         public readonly string $text,
+        /** @var string Model name. */
         public readonly string $model,
-        public readonly int    $inputtokens = 0,
-        public readonly int    $outputtokens = 0,
-        public readonly int    $totaltokens = 0,
-        public readonly float  $estimatedcost = 0.0,
-        public readonly array  $metadata = [],
+        /** @var int Input tokens. */
+        public readonly int $inputtokens = 0,
+        /** @var int Output tokens. */
+        public readonly int $outputtokens = 0,
+        /** @var int Total tokens. */
+        public readonly int $totaltokens = 0,
+        /** @var float Estimated cost. */
+        public readonly float $estimatedcost = 0.0,
+        /** @var array Response metadata. */
+        public readonly array $metadata = [],
     ) {
     }
 }
