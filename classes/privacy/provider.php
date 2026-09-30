@@ -24,19 +24,23 @@
 
 namespace local_ai_bridge\privacy;
 
+use context;
+use context_system;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\contextlist;
+use core_privacy\local\request\core_userlist_provider;
 use core_privacy\local\request\userlist;
+use core_privacy\local\request\writer;
 
 /**
  * Class provider.
  */
 final class provider implements
-        \core_privacy\local\metadata\provider,
-        \core_privacy\local\request\plugin\provider,
-        \core_privacy\local\request\core_userlist_provider {
+    \core_privacy\local\metadata\provider,
+    \core_privacy\local\request\plugin\provider,
+    core_userlist_provider {
 
     /**
      * Method get_metadata.
@@ -103,7 +107,7 @@ final class provider implements
      */
     public static function export_user_data(approved_contextlist $contextlist): void {
         global $DB;
-        $context = \context_system::instance();
+        $context = context_system::instance();
         if (!in_array($context->id, $contextlist->get_contextids(), true)) {
             return;
         }
@@ -115,7 +119,7 @@ final class provider implements
             'credits_as_user' => array_values($DB->get_records('local_ai_bridge_credit', ['userid' => $userid], 'timecreated ASC')),
             'credits_as_actor' => array_values($DB->get_records('local_ai_bridge_credit', ['actorid' => $userid], 'timecreated ASC')),
         ];
-        \core_privacy\local\request\writer::with_context($context)->export_data([
+        writer::with_context($context)->export_data([
             get_string('pluginname', 'local_ai_bridge')
         ], $data);
     }
@@ -123,12 +127,12 @@ final class provider implements
     /**
      * Method delete_data_for_all_users_in_context.
      *
-     * @param \context $context Parameter context.
+     * @param context $context Parameter context.
      * @return void Return value.
      */
-    public static function delete_data_for_all_users_in_context(\context $context): void {
+    public static function delete_data_for_all_users_in_context(context $context): void {
         global $DB;
-        if (!$context instanceof \context_system) {
+        if (!$context instanceof context_system) {
             return;
         }
         $DB->delete_records('local_ai_bridge_usage');
@@ -146,7 +150,7 @@ final class provider implements
      */
     public static function delete_data_for_user(approved_contextlist $contextlist): void {
         global $DB;
-        $context = \context_system::instance();
+        $context = context_system::instance();
         if (!in_array($context->id, $contextlist->get_contextids(), true)) {
             return;
         }
@@ -161,7 +165,7 @@ final class provider implements
      * @return void Return value.
      */
     public static function get_users_in_context(userlist $userlist): void {
-        if (!$userlist->get_context() instanceof \context_system) {
+        if (!$userlist->get_context() instanceof context_system) {
             return;
         }
         $userlist->add_from_sql('userid', 'SELECT userid FROM {local_ai_bridge_user}', []);
@@ -178,7 +182,7 @@ final class provider implements
      * @return void Return value.
      */
     public static function delete_data_for_users(approved_userlist $userlist): void {
-        if (!$userlist->get_context() instanceof \context_system) {
+        if (!$userlist->get_context() instanceof context_system) {
             return;
         }
         foreach ($userlist->get_userids() as $userid) {

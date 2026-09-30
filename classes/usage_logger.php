@@ -25,6 +25,9 @@
 namespace local_ai_bridge;
 
 use local_ai_bridge\local\bridge\response;
+use moodle_exception;
+use stdClass;
+use Throwable;
 
 /**
  * Class usage_logger.
@@ -33,17 +36,17 @@ final class usage_logger {
     /**
      * Method success.
      *
-     * @param \stdClass $tenant Parameter tenant.
+     * @param stdClass $tenant Parameter tenant.
      * @param int $userid Parameter userid.
-     * @param \stdClass $purpose Parameter purpose.
-     * @param \stdClass $usercontrol Parameter usercontrol.
-     * @param \stdClass $route Parameter route.
+     * @param stdClass $purpose Parameter purpose.
+     * @param stdClass $usercontrol Parameter usercontrol.
+     * @param stdClass $route Parameter route.
      * @param response $response Parameter response.
      * @param int $latencyms Parameter latencyms.
      * @return int Return value.
      */
-    public static function success(\stdClass $tenant, int $userid, \stdClass $purpose, \stdClass $usercontrol,
-            \stdClass $route, response $response, int $latencyms): int {
+    public static function success(stdClass $tenant, int $userid, stdClass $purpose, stdClass $usercontrol,
+                                   stdClass $route, response $response, int $latencyms): int {
         global $DB;
         return $DB->insert_record('local_ai_bridge_usage', (object)[
             'tenantid' => $tenant->id,
@@ -68,22 +71,22 @@ final class usage_logger {
     /**
      * Method failure.
      *
-     * @param \stdClass $tenant Parameter tenant.
+     * @param stdClass $tenant Parameter tenant.
      * @param int $userid Parameter userid.
-     * @param \stdClass $purpose Parameter purpose.
-     * @param \stdClass $usercontrol Parameter usercontrol.
-     * @param \stdClass $route Parameter route.
-     * @param \Throwable $exception Parameter exception.
+     * @param stdClass $purpose Parameter purpose.
+     * @param stdClass $usercontrol Parameter usercontrol.
+     * @param stdClass $route Parameter route.
+     * @param Throwable $exception Parameter exception.
      * @param int $latencyms Parameter latencyms.
      * @return void Return value.
      */
-    public static function failure(\stdClass $tenant, int $userid, \stdClass $purpose, \stdClass $usercontrol,
-            \stdClass $route, \Throwable $exception, int $latencyms): void {
+    public static function failure(stdClass $tenant, int $userid, stdClass $purpose, stdClass $usercontrol,
+                                   stdClass $route, Throwable $exception, int $latencyms): void {
         global $DB;
         if (!get_config('local_ai_bridge', 'logfailures')) {
             return;
         }
-        $code = $exception instanceof \moodle_exception ? $exception->errorcode : get_class($exception);
+        $code = $exception instanceof moodle_exception ? $exception->errorcode : get_class($exception);
         $DB->insert_record('local_ai_bridge_usage', (object)[
             'tenantid' => $tenant->id,
             'userid' => $userid,

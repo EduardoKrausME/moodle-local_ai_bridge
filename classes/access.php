@@ -24,6 +24,9 @@
 
 namespace local_ai_bridge;
 
+use context_system;
+use required_capability_exception;
+
 /**
  * Class access.
  */
@@ -37,7 +40,7 @@ final class access {
      */
     public static function can_manage_tenant(int $userid, int $tenantid): bool {
         global $DB;
-        $context = \context_system::instance();
+        $context = context_system::instance();
         if (has_capability('local/ai_bridge:manageall', $context, $userid)) {
             return true;
         }
@@ -53,7 +56,7 @@ final class access {
     public static function require_manage_tenant(int $tenantid): void {
         global $USER;
         if (!self::can_manage_tenant((int)$USER->id, $tenantid)) {
-            throw new \required_capability_exception(\context_system::instance(), 'local/ai_bridge:manageall', 'nopermissions', '');
+            throw new required_capability_exception(context_system::instance(), 'local/ai_bridge:manageall', 'nopermissions', '');
         }
     }
 
@@ -76,7 +79,7 @@ final class access {
      */
     public static function manageable_tenants(int $userid): array {
         global $DB;
-        $context = \context_system::instance();
+        $context = context_system::instance();
         if (has_capability('local/ai_bridge:manageall', $context, $userid)) {
             return $DB->get_records('local_ai_bridge_tenant', null, 'name ASC');
         }

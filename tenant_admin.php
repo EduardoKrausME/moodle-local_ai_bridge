@@ -22,6 +22,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_ai_bridge\form\tenant_admin_form;
+
 require_once(__DIR__ . '/../../config.php');
 require_once("{$CFG->libdir}/formslib.php");
 require_login();
@@ -39,7 +41,7 @@ $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/ai_bridge/tenant_admin.php', ['tenantid' => $tenantid]));
 $PAGE->set_title(get_string('addtenantadmin', 'local_ai_bridge'));
 $PAGE->set_heading(format_string($tenant->name));
-$form = new \local_ai_bridge\form\tenant_admin_form();
+$form = new tenant_admin_form();
 $form->set_data(['tenantid' => $tenantid]);
 if ($form->is_cancelled()) {
     redirect(new moodle_url('/local/ai_bridge/manage.php', ['tenantid' => $tenantid, 'tab' => 'admins']));
@@ -56,4 +58,6 @@ if ($data = $form->get_data()) {
     }
     redirect(new moodle_url('/local/ai_bridge/manage.php', ['tenantid' => $tenantid, 'tab' => 'admins']), get_string('changessaved'));
 }
-echo $OUTPUT->header(); $form->display(); echo $OUTPUT->footer();
+echo $OUTPUT->header();
+$form->display();
+echo $OUTPUT->footer();

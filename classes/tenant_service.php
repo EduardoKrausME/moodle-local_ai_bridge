@@ -24,6 +24,8 @@
 
 namespace local_ai_bridge;
 
+use stdClass;
+
 /**
  * Class tenant_service.
  */
@@ -32,9 +34,9 @@ final class tenant_service {
      * Method create.
      *
      * @param array $data Parameter data.
-     * @return \stdClass Return value.
+     * @return stdClass Return value.
      */
-    public static function create(array $data): \stdClass {
+    public static function create(array $data): stdClass {
         global $DB;
         $now = time();
         $record = (object)[
@@ -83,9 +85,9 @@ final class tenant_service {
      *
      * @param string $institution Parameter institution.
      * @param string $department Parameter department.
-     * @return ?\stdClass Return value.
+     * @return ?stdClass Return value.
      */
-    public static function ensure_from_profile(string $institution, string $department): ?\stdClass {
+    public static function ensure_from_profile(string $institution, string $department): ?stdClass {
         global $DB;
         $mode = get_config('local_ai_bridge', 'tenantkey') ?: 'institution_department';
         $conditions = self::profile_conditions($mode, $institution, $department);

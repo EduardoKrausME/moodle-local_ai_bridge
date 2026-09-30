@@ -24,10 +24,13 @@
 
 namespace aibridge_claude;
 
+use curl;
 use local_ai_bridge\local\bridge\provider_interface;
 use local_ai_bridge\local\bridge\request;
 use local_ai_bridge\local\bridge\response;
 use local_ai_bridge\local\security\url_guard;
+use moodle_exception;
+use MoodleQuickForm;
 
 /**
  * Anthropic Claude Messages API bridge.
@@ -95,11 +98,11 @@ final class bridge implements provider_interface {
     /**
      * Method add_config_form_elements.
      *
-     * @param \MoodleQuickForm $mform Parameter mform.
+     * @param MoodleQuickForm $mform Parameter mform.
      * @param string $prefix Parameter prefix.
      * @return void Return value.
      */
-    public function add_config_form_elements(\MoodleQuickForm $mform, string $prefix): void {
+    public function add_config_form_elements(MoodleQuickForm $mform, string $prefix): void {
         $mform->addElement('passwordunmask', $prefix . 'apikey', get_string('apikey', 'aibridge_claude'));
         $mform->setType($prefix . 'apikey', PARAM_RAW_TRIMMED);
         $mform->addRule($prefix . 'apikey', null, 'required', null, 'client');
@@ -151,7 +154,7 @@ final class bridge implements provider_interface {
 
         if (empty($config['apikey'])) {
             $errors['apikey'] = get_string('required');
-        } elseif ($this->contains_line_break((string)$config['apikey'])) {
+        } else if ($this->contains_line_break((string)$config['apikey'])) {
             $errors['apikey'] = get_string('error:invalidheader', 'aibridge_claude');
         }
 
@@ -196,13 +199,13 @@ final class bridge implements provider_interface {
     public function generate(request $request, array $config, string $model): response {
         $baseurl = rtrim((string)($config['baseurl'] ?? ''), '/');
         if ($error = url_guard::validate($baseurl)) {
-            throw new \moodle_exception('error:invalidendpoint', 'local_ai_bridge');
+            throw new moodle_exception('error:invalidendpoint', 'local_ai_bridge');
         }
 
         $headers = $this->build_headers($config);
         $payload = $this->build_payload($request, $config, $model);
 
-        $curl = new \curl();
+        $curl = new curl();
         $curl->setHeader($headers);
         $raw = $curl->post(
             $baseurl . '/messages',
@@ -219,11 +222,11 @@ final class bridge implements provider_interface {
             if (is_array($data)) {
                 $message = (string)($data['error']['message'] ?? $data['message'] ?? $message);
             }
-            throw new \moodle_exception('error:request', 'aibridge_claude', '', $message);
+            throw new moodle_exception('error:request', 'aibridge_claude', '', $message);
         }
 
         if (!is_array($data) || !isset($data['content']) || !is_array($data['content'])) {
-            throw new \moodle_exception('error:response', 'aibridge_claude');
+            throw new moodle_exception('error:response', 'aibridge_claude');
         }
 
         $text = $this->extract_text($data['content']);
@@ -275,7 +278,7 @@ final class bridge implements provider_interface {
 
         foreach ([$apikey, $apiversion, $betas] as $value) {
             if ($this->contains_line_break($value)) {
-                throw new \moodle_exception('error:invalidheader', 'aibridge_claude');
+                throw new moodle_exception('error:invalidheader', 'aibridge_claude');
             }
         }
 
@@ -339,7 +342,7 @@ final class bridge implements provider_interface {
             }
 
             if (!in_array($role, ['user', 'assistant'], true)) {
-                throw new \moodle_exception('error:invalidrole', 'aibridge_claude');
+                throw new moodle_exception('error:invalidrole', 'aibridge_claude');
             }
 
             $conversation[] = [
@@ -382,7 +385,7 @@ final class bridge implements provider_interface {
         foreach ($content as $block) {
             if (is_string($block)) {
                 $blocks[] = ['type' => 'text', 'text' => $block];
-            } elseif (is_array($block)) {
+            } else if (is_array($block)) {
                 $blocks[] = $block;
             }
         }

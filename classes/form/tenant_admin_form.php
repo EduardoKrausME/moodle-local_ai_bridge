@@ -24,13 +24,15 @@
 
 namespace local_ai_bridge\form;
 
+use moodleform;
+
 defined('MOODLE_INTERNAL') || die();
 require_once("{$CFG->libdir}/formslib.php");
 
 /**
  * Class tenant_admin_form.
  */
-final class tenant_admin_form extends \moodleform {
+final class tenant_admin_form extends moodleform {
     /**
      * Method definition.
      *

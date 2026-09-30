@@ -24,6 +24,8 @@
 
 namespace local_ai_bridge;
 
+use stdClass;
+
 /**
  * Class user_service.
  */
@@ -33,9 +35,9 @@ final class user_service {
      *
      * @param int $tenantid Parameter tenantid.
      * @param int $userid Parameter userid.
-     * @return \stdClass Return value.
+     * @return stdClass Return value.
      */
-    public static function get_or_create(int $tenantid, int $userid): \stdClass {
+    public static function get_or_create(int $tenantid, int $userid): stdClass {
         global $DB;
         $record = $DB->get_record('local_ai_bridge_user', ['tenantid' => $tenantid, 'userid' => $userid]);
         if ($record) {

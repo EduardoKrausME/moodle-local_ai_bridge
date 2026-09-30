@@ -24,10 +24,12 @@
 
 namespace local_ai_bridge;
 
+use advanced_testcase;
+
 /**
  * Class tenant_service_test.
  */
-final class tenant_service_test extends \advanced_testcase {
+final class tenant_service_test extends advanced_testcase {
     /**
      * Method test_profile_conditions.
      *

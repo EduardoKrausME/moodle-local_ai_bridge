@@ -1,8 +1,8 @@
 {
-    "plugintypes": {
-        "aibridge": "local/ai_bridge/bridge"
-    },
-    "subplugintypes": {
-        "aibridge": "bridge"
-    }
+  "plugintypes": {
+    "aibridge": "local/ai_bridge/bridge"
+  },
+  "subplugintypes": {
+    "aibridge": "bridge"
+  }
 }

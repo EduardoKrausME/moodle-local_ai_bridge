@@ -38,7 +38,7 @@ function local_ai_bridge_extend_navigation(global_navigation $navigation): void 
     }
     $context = context_system::instance();
     if (has_capability('local/ai_bridge:manageall', $context) ||
-            access::has_any_tenant_admin_assignment((int)$USER->id)) {
+        access::has_any_tenant_admin_assignment((int)$USER->id)) {
         $navigation->add(
             get_string('pluginname', 'local_ai_bridge'),
             new moodle_url('/local/ai_bridge/manage.php'),

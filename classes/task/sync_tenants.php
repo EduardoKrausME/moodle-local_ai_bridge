@@ -24,10 +24,13 @@
 
 namespace local_ai_bridge\task;
 
+use core\task\scheduled_task;
+use local_ai_bridge\tenant_service;
+
 /**
  * Class sync_tenants.
  */
-final class sync_tenants extends \core\task\scheduled_task {
+final class sync_tenants extends scheduled_task {
     /**
      * Method get_name.
      *
@@ -52,7 +55,7 @@ final class sync_tenants extends \core\task\scheduled_task {
                  WHERE deleted = 0 AND suspended = 0 AND id > 1";
         $users = $DB->get_recordset_sql($sql);
         foreach ($users as $user) {
-            \local_ai_bridge\tenant_service::ensure_from_profile((string)$user->institution, (string)$user->department);
+            tenant_service::ensure_from_profile((string)$user->institution, (string)$user->department);
         }
         $users->close();
     }

@@ -22,6 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_ai_bridge\access;
 use local_ai_bridge\bridge_manager;
 use local_ai_bridge\form\connection_form;
 
@@ -30,7 +31,7 @@ require_once("{$CFG->libdir}/formslib.php");
 require_login();
 $tenantid = required_param('tenantid', PARAM_INT);
 $id = optional_param('id', 0, PARAM_INT);
-\local_ai_bridge\access::require_manage_tenant($tenantid);
+access::require_manage_tenant($tenantid);
 $tenant = $DB->get_record('local_ai_bridge_tenant', ['id' => $tenantid], '*', MUST_EXIST);
 $record = $id ? $DB->get_record('local_ai_bridge_connection', ['id' => $id, 'tenantid' => $tenantid], '*', MUST_EXIST) : null;
 $bridgename = $record ? $record->bridge : optional_param('bridge', '', PARAM_ALPHANUMEXT);

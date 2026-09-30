@@ -24,6 +24,10 @@
 
 namespace local_ai_bridge;
 
+use core\lock\lock_config;
+use moodle_exception;
+use stdClass;
+
 /**
  * Class credit_manager.
  */
@@ -31,21 +35,21 @@ final class credit_manager {
     /**
      * Method assert_available.
      *
-     * @param \stdClass $tenant Parameter tenant.
-     * @param \stdClass $usercontrol Parameter usercontrol.
+     * @param stdClass $tenant Parameter tenant.
+     * @param stdClass $usercontrol Parameter usercontrol.
      * @param float $credits Parameter credits.
      * @return void Return value.
      */
-    public static function assert_available(\stdClass $tenant, \stdClass $usercontrol, float $credits): void {
+    public static function assert_available(stdClass $tenant, stdClass $usercontrol, float $credits): void {
         if ($credits <= 0) {
             return;
         }
         if ((float)$tenant->creditbalance < $credits) {
-            throw new \moodle_exception('error:tenantcredits', 'local_ai_bridge');
+            throw new moodle_exception('error:tenantcredits', 'local_ai_bridge');
         }
         if ($usercontrol->creditlimit !== null && $usercontrol->creditlimit !== '' &&
-                ((float)$usercontrol->creditused + $credits) > (float)$usercontrol->creditlimit) {
-            throw new \moodle_exception('error:usercredits', 'local_ai_bridge');
+            ((float)$usercontrol->creditused + $credits) > (float)$usercontrol->creditlimit) {
+            throw new moodle_exception('error:usercredits', 'local_ai_bridge');
         }
     }
 
@@ -63,10 +67,10 @@ final class credit_manager {
         if ($credits <= 0) {
             return;
         }
-        $factory = \core\lock\lock_config::get_lock_factory('local_ai_bridge');
+        $factory = lock_config::get_lock_factory('local_ai_bridge');
         $lock = $factory->get_lock('credits_tenant_' . $tenantid, 10);
         if (!$lock) {
-            throw new \moodle_exception('error:creditlock', 'local_ai_bridge');
+            throw new moodle_exception('error:creditlock', 'local_ai_bridge');
         }
         try {
             $tenant = $DB->get_record('local_ai_bridge_tenant', ['id' => $tenantid], '*', MUST_EXIST);
@@ -104,10 +108,10 @@ final class credit_manager {
      */
     public static function adjust(int $tenantid, float $amount, int $actorid, string $note = ''): void {
         global $DB;
-        $factory = \core\lock\lock_config::get_lock_factory('local_ai_bridge');
+        $factory = lock_config::get_lock_factory('local_ai_bridge');
         $lock = $factory->get_lock('credits_tenant_' . $tenantid, 10);
         if (!$lock) {
-            throw new \moodle_exception('error:creditlock', 'local_ai_bridge');
+            throw new moodle_exception('error:creditlock', 'local_ai_bridge');
         }
         try {
             $transaction = $DB->start_delegated_transaction();

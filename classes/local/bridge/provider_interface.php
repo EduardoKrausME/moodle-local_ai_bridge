@@ -24,6 +24,8 @@
 
 namespace local_ai_bridge\local\bridge;
 
+use MoodleQuickForm;
+
 /**
  * Contract implemented by every AI bridge subplugin.
  *
@@ -37,38 +39,44 @@ interface provider_interface {
      * @return string Return value.
      */
     public function get_component(): string;
+
     /**
      * Method get_name.
      *
      * @return string Return value.
      */
     public function get_name(): string;
+
     /**
      * Method get_description.
      *
      * @return string Return value.
      */
     public function get_description(): string;
+
     /**
      * Method add_config_form_elements.
      *
-     * @param \MoodleQuickForm $mform Parameter mform.
+     * @param MoodleQuickForm $mform Parameter mform.
      * @param string $prefix Parameter prefix.
      * @return void Return value.
      */
-    public function add_config_form_elements(\MoodleQuickForm $mform, string $prefix): void;
+    public function add_config_form_elements(MoodleQuickForm $mform, string $prefix): void;
+
     /**
      * Method get_default_config.
      *
      * @return array Return value.
      */
     public function get_default_config(): array;
+
     /**
      * Method get_secret_fields.
      *
      * @return array Return value.
      */
     public function get_secret_fields(): array;
+
     /**
      * Method validate_config.
      *
@@ -76,6 +84,7 @@ interface provider_interface {
      * @return array Return value.
      */
     public function validate_config(array $config): array;
+
     /**
      * Method generate.
      *

@@ -24,10 +24,12 @@
 
 namespace aibridge_claude\privacy;
 
+use core_privacy\local\metadata\null_provider;
+
 /**
  * Class provider.
  */
-final class provider implements \core_privacy\local\metadata\null_provider {
+final class provider implements null_provider {
     /**
      * Method get_reason.
      *

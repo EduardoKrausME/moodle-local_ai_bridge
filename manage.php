@@ -22,6 +22,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_ai_bridge\access;
+use local_ai_bridge\output\manager;
+
 require_once(__DIR__ . '/../../config.php');
 
 require_login();
@@ -31,7 +34,7 @@ $PAGE->set_url(new moodle_url('/local/ai_bridge/manage.php'));
 $PAGE->set_title(get_string('manage', 'local_ai_bridge'));
 $PAGE->set_heading(get_string('pluginname', 'local_ai_bridge'));
 
-$tenants = \local_ai_bridge\access::manageable_tenants((int)$USER->id);
+$tenants = access::manageable_tenants((int)$USER->id);
 if (!$tenants) {
     if (has_capability('local/ai_bridge:managetenants', $context, (int)$USER->id)) {
         redirect(new moodle_url('/local/ai_bridge/tenant.php'));
@@ -44,7 +47,7 @@ if (!$tenantid) {
     $tenantid = (int)array_key_first($tenants);
 }
 if (!isset($tenants[$tenantid])) {
-    \local_ai_bridge\access::require_manage_tenant($tenantid);
+    access::require_manage_tenant($tenantid);
 }
 $tenant = $DB->get_record('local_ai_bridge_tenant', ['id' => $tenantid], '*', MUST_EXIST);
 $tab = optional_param('tab', 'overview', PARAM_ALPHA);
@@ -77,31 +80,31 @@ echo $OUTPUT->tabtree($tabs, $tab);
 
 switch ($tab) {
     case 'purposes':
-        echo \local_ai_bridge\output\manager::purposes($tenant);
+        echo manager::purposes($tenant);
         break;
     case 'connections':
-        echo \local_ai_bridge\output\manager::connections($tenant);
+        echo manager::connections($tenant);
         break;
     case 'roles':
-        echo \local_ai_bridge\output\manager::roles($tenant);
+        echo manager::roles($tenant);
         break;
     case 'routes':
-        echo \local_ai_bridge\output\manager::routes($tenant);
+        echo manager::routes($tenant);
         break;
     case 'users':
-        echo \local_ai_bridge\output\manager::users($tenant);
+        echo manager::users($tenant);
         break;
     case 'credits':
-        echo \local_ai_bridge\output\manager::credits($tenant);
+        echo manager::credits($tenant);
         break;
     case 'admins':
-        echo \local_ai_bridge\output\manager::admins($tenant);
+        echo manager::admins($tenant);
         break;
     case 'stats':
-        echo \local_ai_bridge\output\manager::stats($tenant);
+        echo manager::stats($tenant);
         break;
     default:
-        echo \local_ai_bridge\output\manager::overview($tenant);
+        echo manager::overview($tenant);
 }
 
 echo $OUTPUT->footer();

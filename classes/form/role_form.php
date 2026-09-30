@@ -24,13 +24,15 @@
 
 namespace local_ai_bridge\form;
 
+use moodleform;
+
 defined('MOODLE_INTERNAL') || die();
 require_once("{$CFG->libdir}/formslib.php");
 
 /**
  * Class role_form.
  */
-final class role_form extends \moodleform {
+final class role_form extends moodleform {
     /**
      * Method definition.
      *

@@ -24,6 +24,8 @@
 
 namespace local_ai_bridge;
 
+use stdClass;
+
 /**
  * Class tenant_resolver.
  */
@@ -32,9 +34,9 @@ final class tenant_resolver {
      * Method resolve_user.
      *
      * @param int $userid Parameter userid.
-     * @return ?\stdClass Return value.
+     * @return ?stdClass Return value.
      */
-    public static function resolve_user(int $userid): ?\stdClass {
+    public static function resolve_user(int $userid): ?stdClass {
         global $DB;
         $user = $DB->get_record('user', ['id' => $userid, 'deleted' => 0], 'id,institution,department', MUST_EXIST);
         $mode = get_config('local_ai_bridge', 'tenantkey') ?: 'institution_department';

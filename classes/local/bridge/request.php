@@ -37,10 +37,10 @@ final class request {
      * @param array $options Parameter options.
      */
     public function __construct(
-        public readonly array $messages,
+        public readonly array  $messages,
         public readonly ?float $temperature = null,
-        public readonly ?int $maxoutputtokens = null,
-        public readonly array $options = [],
+        public readonly ?int   $maxoutputtokens = null,
+        public readonly array  $options = [],
     ) {
     }
 
