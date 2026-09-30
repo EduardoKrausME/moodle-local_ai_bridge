@@ -14,7 +14,7 @@ The parent plugin defines the subplugin type `aibridge`. Bundled providers are i
 
 The parent **does not contain provider-specific request logic**. Each bridge subplugin owns its configuration form,
 validation, authentication headers, request payload, HTTP call, response parsing, token accounting and provider cost
-calculation. New providers implement `local_ai_bridge\local\bridge\provider_interface` and can be added without changing
+calculation. New providers implement `local_ai_bridge\bridge\provider_interface` and can be added without changing
 the parent router.
 
 Both legacy `plugintypes` and modern `subplugintypes` declarations are included in `db/subplugins.json` so the bundled

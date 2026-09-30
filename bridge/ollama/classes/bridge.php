@@ -25,10 +25,10 @@
 namespace aibridge_ollama;
 
 use curl;
-use local_ai_bridge\local\bridge\provider_interface;
-use local_ai_bridge\local\bridge\request;
-use local_ai_bridge\local\bridge\response;
-use local_ai_bridge\local\security\url_guard;
+use local_ai_bridge\bridge\provider_interface;
+use local_ai_bridge\bridge\request;
+use local_ai_bridge\bridge\response;
+use local_ai_bridge\security\url_guard;
 use moodle_exception;
 use MoodleQuickForm;
 

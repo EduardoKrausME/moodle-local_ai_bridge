@@ -26,8 +26,8 @@ namespace local_ai_bridge;
 
 use context_system;
 use invalid_parameter_exception;
-use local_ai_bridge\local\bridge\request;
-use local_ai_bridge\local\bridge\response;
+use local_ai_bridge\bridge\request;
+use local_ai_bridge\bridge\response;
 use moodle_exception;
 use required_capability_exception;
 use Throwable;

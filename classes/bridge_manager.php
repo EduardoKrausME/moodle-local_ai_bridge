@@ -26,7 +26,7 @@ namespace local_ai_bridge;
 
 use core\encryption;
 use core_component;
-use local_ai_bridge\local\bridge\provider_interface;
+use local_ai_bridge\bridge\provider_interface;
 use moodle_exception;
 use Throwable;
 

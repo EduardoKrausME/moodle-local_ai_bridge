@@ -52,15 +52,24 @@ if (!isset($tenants[$tenantid])) {
 $tenant = $DB->get_record('local_ai_bridge_tenant', ['id' => $tenantid], '*', MUST_EXIST);
 $tab = optional_param('tab', 'overview', PARAM_ALPHA);
 $tabs = [
-    new tabobject('overview', new moodle_url('/local/ai_bridge/manage.php', ['tenantid' => $tenantid, 'tab' => 'overview']), get_string('overview', 'local_ai_bridge')),
-    new tabobject('purposes', new moodle_url('/local/ai_bridge/manage.php', ['tenantid' => $tenantid, 'tab' => 'purposes']), get_string('purposes', 'local_ai_bridge')),
-    new tabobject('connections', new moodle_url('/local/ai_bridge/manage.php', ['tenantid' => $tenantid, 'tab' => 'connections']), get_string('connections', 'local_ai_bridge')),
-    new tabobject('roles', new moodle_url('/local/ai_bridge/manage.php', ['tenantid' => $tenantid, 'tab' => 'roles']), get_string('roles', 'local_ai_bridge')),
-    new tabobject('routes', new moodle_url('/local/ai_bridge/manage.php', ['tenantid' => $tenantid, 'tab' => 'routes']), get_string('routes', 'local_ai_bridge')),
-    new tabobject('users', new moodle_url('/local/ai_bridge/manage.php', ['tenantid' => $tenantid, 'tab' => 'users']), get_string('users')),
-    new tabobject('credits', new moodle_url('/local/ai_bridge/manage.php', ['tenantid' => $tenantid, 'tab' => 'credits']), get_string('credits', 'local_ai_bridge')),
-    new tabobject('admins', new moodle_url('/local/ai_bridge/manage.php', ['tenantid' => $tenantid, 'tab' => 'admins']), get_string('tenantadmins', 'local_ai_bridge')),
-    new tabobject('stats', new moodle_url('/local/ai_bridge/manage.php', ['tenantid' => $tenantid, 'tab' => 'stats']), get_string('statistics')),
+    new tabobject('overview', new moodle_url('/local/ai_bridge/manage.php',
+        ['tenantid' => $tenantid, 'tab' => 'overview']), get_string('overview', 'local_ai_bridge')),
+    new tabobject('purposes', new moodle_url('/local/ai_bridge/manage.php',
+        ['tenantid' => $tenantid, 'tab' => 'purposes']), get_string('purposes', 'local_ai_bridge')),
+    new tabobject('connections', new moodle_url('/local/ai_bridge/manage.php',
+        ['tenantid' => $tenantid, 'tab' => 'connections']), get_string('connections', 'local_ai_bridge')),
+    new tabobject('roles', new moodle_url('/local/ai_bridge/manage.php',
+        ['tenantid' => $tenantid, 'tab' => 'roles']), get_string('roles', 'local_ai_bridge')),
+    new tabobject('routes', new moodle_url('/local/ai_bridge/manage.php',
+        ['tenantid' => $tenantid, 'tab' => 'routes']), get_string('routes', 'local_ai_bridge')),
+    new tabobject('users', new moodle_url('/local/ai_bridge/manage.php',
+        ['tenantid' => $tenantid, 'tab' => 'users']), get_string('users')),
+    new tabobject('credits', new moodle_url('/local/ai_bridge/manage.php',
+        ['tenantid' => $tenantid, 'tab' => 'credits']), get_string('credits', 'local_ai_bridge')),
+    new tabobject('admins', new moodle_url('/local/ai_bridge/manage.php',
+        ['tenantid' => $tenantid, 'tab' => 'admins']), get_string('tenantadmins', 'local_ai_bridge')),
+    new tabobject('stats', new moodle_url('/local/ai_bridge/manage.php',
+        ['tenantid' => $tenantid, 'tab' => 'stats']), get_string('statistics')),
 ];
 
 echo $OUTPUT->header();

@@ -24,7 +24,7 @@
 
 namespace local_ai_bridge;
 
-use local_ai_bridge\local\bridge\response;
+use local_ai_bridge\bridge\response;
 use moodle_exception;
 use stdClass;
 use Throwable;

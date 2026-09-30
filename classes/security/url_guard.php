@@ -22,7 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_ai_bridge\local\security;
+namespace local_ai_bridge\security;
 
 /**
  * Class url_guard.
