@@ -1,9 +1,41 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * credit_manager.php
+ *
+ * @package   local_ai_bridge
+ * @copyright 2026 Eduardo Kraus {@link https://eduardokraus.com}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_ai_bridge;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Class credit_manager.
+ */
 final class credit_manager {
+    /**
+     * Method assert_available.
+     *
+     * @param \stdClass $tenant Parameter tenant.
+     * @param \stdClass $usercontrol Parameter usercontrol.
+     * @param float $credits Parameter credits.
+     * @return void Return value.
+     */
     public static function assert_available(\stdClass $tenant, \stdClass $usercontrol, float $credits): void {
         if ($credits <= 0) {
             return;
@@ -17,6 +49,15 @@ final class credit_manager {
         }
     }
 
+    /**
+     * Method debit.
+     *
+     * @param int $tenantid Parameter tenantid.
+     * @param int $userid Parameter userid.
+     * @param int $usageid Parameter usageid.
+     * @param float $credits Parameter credits.
+     * @return void Return value.
+     */
     public static function debit(int $tenantid, int $userid, int $usageid, float $credits): void {
         global $DB;
         if ($credits <= 0) {
@@ -52,6 +93,15 @@ final class credit_manager {
         }
     }
 
+    /**
+     * Method adjust.
+     *
+     * @param int $tenantid Parameter tenantid.
+     * @param float $amount Parameter amount.
+     * @param int $actorid Parameter actorid.
+     * @param string $note Parameter note.
+     * @return void Return value.
+     */
     public static function adjust(int $tenantid, float $amount, int $actorid, string $note = ''): void {
         global $DB;
         $factory = \core\lock\lock_config::get_lock_factory('local_ai_bridge');

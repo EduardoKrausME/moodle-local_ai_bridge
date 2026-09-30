@@ -1,9 +1,39 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * tenant_service.php
+ *
+ * @package   local_ai_bridge
+ * @copyright 2026 Eduardo Kraus {@link https://eduardokraus.com}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_ai_bridge;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Class tenant_service.
+ */
 final class tenant_service {
+    /**
+     * Method create.
+     *
+     * @param array $data Parameter data.
+     * @return \stdClass Return value.
+     */
     public static function create(array $data): \stdClass {
         global $DB;
         $now = time();
@@ -24,6 +54,12 @@ final class tenant_service {
         return $record;
     }
 
+    /**
+     * Method create_default_roles.
+     *
+     * @param int $tenantid Parameter tenantid.
+     * @return void Return value.
+     */
     public static function create_default_roles(int $tenantid): void {
         global $DB;
         $now = time();
@@ -42,6 +78,13 @@ final class tenant_service {
         }
     }
 
+    /**
+     * Method ensure_from_profile.
+     *
+     * @param string $institution Parameter institution.
+     * @param string $department Parameter department.
+     * @return ?\stdClass Return value.
+     */
     public static function ensure_from_profile(string $institution, string $department): ?\stdClass {
         global $DB;
         $mode = get_config('local_ai_bridge', 'tenantkey') ?: 'institution_department';
@@ -77,6 +120,14 @@ final class tenant_service {
         ]);
     }
 
+    /**
+     * Method profile_conditions.
+     *
+     * @param string $mode Parameter mode.
+     * @param string $institution Parameter institution.
+     * @param string $department Parameter department.
+     * @return ?array Return value.
+     */
     public static function profile_conditions(string $mode, string $institution, string $department): ?array {
         $institution = trim($institution);
         $department = trim($department);

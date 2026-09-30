@@ -1,7 +1,28 @@
 <?php
-namespace local_ai_bridge\privacy;
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * provider.php
+ *
+ * @package   local_ai_bridge
+ * @copyright 2026 Eduardo Kraus {@link https://eduardokraus.com}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace local_ai_bridge\privacy;
 
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
@@ -9,11 +30,20 @@ use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\contextlist;
 use core_privacy\local\request\userlist;
 
+/**
+ * Class provider.
+ */
 final class provider implements
         \core_privacy\local\metadata\provider,
         \core_privacy\local\request\plugin\provider,
         \core_privacy\local\request\core_userlist_provider {
 
+    /**
+     * Method get_metadata.
+     *
+     * @param collection $collection Parameter collection.
+     * @return collection Return value.
+     */
     public static function get_metadata(collection $collection): collection {
         $collection->add_database_table('local_ai_bridge_user', [
             'userid' => 'privacy:metadata:user:userid',
@@ -45,6 +75,12 @@ final class provider implements
         return $collection;
     }
 
+    /**
+     * Method get_contexts_for_userid.
+     *
+     * @param int $userid Parameter userid.
+     * @return contextlist Return value.
+     */
     public static function get_contexts_for_userid(int $userid): contextlist {
         global $DB;
         $contextlist = new contextlist();
@@ -59,6 +95,12 @@ final class provider implements
         return $contextlist;
     }
 
+    /**
+     * Method export_user_data.
+     *
+     * @param approved_contextlist $contextlist Parameter contextlist.
+     * @return void Return value.
+     */
     public static function export_user_data(approved_contextlist $contextlist): void {
         global $DB;
         $context = \context_system::instance();
@@ -78,6 +120,12 @@ final class provider implements
         ], $data);
     }
 
+    /**
+     * Method delete_data_for_all_users_in_context.
+     *
+     * @param \context $context Parameter context.
+     * @return void Return value.
+     */
     public static function delete_data_for_all_users_in_context(\context $context): void {
         global $DB;
         if (!$context instanceof \context_system) {
@@ -90,6 +138,12 @@ final class provider implements
         $DB->set_field('local_ai_bridge_credit', 'actorid', null);
     }
 
+    /**
+     * Method delete_data_for_user.
+     *
+     * @param approved_contextlist $contextlist Parameter contextlist.
+     * @return void Return value.
+     */
     public static function delete_data_for_user(approved_contextlist $contextlist): void {
         global $DB;
         $context = \context_system::instance();
@@ -100,6 +154,12 @@ final class provider implements
         self::delete_userid($userid);
     }
 
+    /**
+     * Method get_users_in_context.
+     *
+     * @param userlist $userlist Parameter userlist.
+     * @return void Return value.
+     */
     public static function get_users_in_context(userlist $userlist): void {
         if (!$userlist->get_context() instanceof \context_system) {
             return;
@@ -111,6 +171,12 @@ final class provider implements
         $userlist->add_from_sql('userid', 'SELECT actorid AS userid FROM {local_ai_bridge_credit} WHERE actorid IS NOT NULL', []);
     }
 
+    /**
+     * Method delete_data_for_users.
+     *
+     * @param approved_userlist $userlist Parameter userlist.
+     * @return void Return value.
+     */
     public static function delete_data_for_users(approved_userlist $userlist): void {
         if (!$userlist->get_context() instanceof \context_system) {
             return;
@@ -120,6 +186,12 @@ final class provider implements
         }
     }
 
+    /**
+     * Method delete_userid.
+     *
+     * @param int $userid Parameter userid.
+     * @return void Return value.
+     */
     private static function delete_userid(int $userid): void {
         global $DB;
         $DB->delete_records('local_ai_bridge_tenant_admin', ['userid' => $userid]);

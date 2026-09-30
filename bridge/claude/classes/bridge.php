@@ -1,7 +1,28 @@
 <?php
-namespace aibridge_claude;
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
+/**
+ * bridge.php
+ *
+ * @package   aibridge_claude
+ * @copyright 2026 Eduardo Kraus {@link https://eduardokraus.com}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace aibridge_claude;
 
 use local_ai_bridge\local\bridge\provider_interface;
 use local_ai_bridge\local\bridge\request;
@@ -15,18 +36,38 @@ use local_ai_bridge\local\security\url_guard;
  * versioning, payload translation, response parsing, usage accounting and cost estimation.
  */
 final class bridge implements provider_interface {
+    /**
+     * Method get_component.
+     *
+     * @return string Return value.
+     */
     public function get_component(): string {
         return 'aibridge_claude';
     }
 
+    /**
+     * Method get_name.
+     *
+     * @return string Return value.
+     */
     public function get_name(): string {
         return get_string('pluginname', 'aibridge_claude');
     }
 
+    /**
+     * Method get_description.
+     *
+     * @return string Return value.
+     */
     public function get_description(): string {
         return get_string('description', 'aibridge_claude');
     }
 
+    /**
+     * Method get_default_config.
+     *
+     * @return array Return value.
+     */
     public function get_default_config(): array {
         return [
             'baseurl' => 'https://api.anthropic.com/v1',
@@ -42,10 +83,22 @@ final class bridge implements provider_interface {
         ];
     }
 
+    /**
+     * Method get_secret_fields.
+     *
+     * @return array Return value.
+     */
     public function get_secret_fields(): array {
         return ['apikey'];
     }
 
+    /**
+     * Method add_config_form_elements.
+     *
+     * @param \MoodleQuickForm $mform Parameter mform.
+     * @param string $prefix Parameter prefix.
+     * @return void Return value.
+     */
     public function add_config_form_elements(\MoodleQuickForm $mform, string $prefix): void {
         $mform->addElement('passwordunmask', $prefix . 'apikey', get_string('apikey', 'aibridge_claude'));
         $mform->setType($prefix . 'apikey', PARAM_RAW_TRIMMED);
@@ -87,6 +140,12 @@ final class bridge implements provider_interface {
         $mform->setType($prefix . 'websearchcost', PARAM_FLOAT);
     }
 
+    /**
+     * Method validate_config.
+     *
+     * @param array $config Parameter config.
+     * @return array Return value.
+     */
     public function validate_config(array $config): array {
         $errors = [];
 
@@ -126,6 +185,14 @@ final class bridge implements provider_interface {
         return $errors;
     }
 
+    /**
+     * Method generate.
+     *
+     * @param request $request Parameter request.
+     * @param array $config Parameter config.
+     * @param string $model Parameter model.
+     * @return response Return value.
+     */
     public function generate(request $request, array $config, string $model): response {
         $baseurl = rtrim((string)($config['baseurl'] ?? ''), '/');
         if ($error = url_guard::validate($baseurl)) {
@@ -195,6 +262,12 @@ final class bridge implements provider_interface {
         );
     }
 
+    /**
+     * Method build_headers.
+     *
+     * @param array $config Parameter config.
+     * @return array Return value.
+     */
     private function build_headers(array $config): array {
         $apikey = trim((string)($config['apikey'] ?? ''));
         $apiversion = trim((string)($config['apiversion'] ?? '2023-06-01'));
@@ -217,6 +290,14 @@ final class bridge implements provider_interface {
         return $headers;
     }
 
+    /**
+     * Method build_payload.
+     *
+     * @param request $request Parameter request.
+     * @param array $config Parameter config.
+     * @param string $model Parameter model.
+     * @return array Return value.
+     */
     private function build_payload(request $request, array $config, string $model): array {
         [$system, $messages] = $this->normalise_messages($request->messages);
 
@@ -235,6 +316,12 @@ final class bridge implements provider_interface {
         return $payload + $request->options;
     }
 
+    /**
+     * Method normalise_messages.
+     *
+     * @param array $messages Parameter messages.
+     * @return array Return value.
+     */
     private function normalise_messages(array $messages): array {
         $systemblocks = [];
         $conversation = [];
@@ -273,6 +360,13 @@ final class bridge implements provider_interface {
         return [$system, $conversation];
     }
 
+    /**
+     * Method append_system_content.
+     *
+     * @param array $blocks Parameter blocks.
+     * @param mixed $content Parameter content.
+     * @return void Return value.
+     */
     private function append_system_content(array &$blocks, mixed $content): void {
         if (is_string($content)) {
             if ($content !== '') {
@@ -294,6 +388,12 @@ final class bridge implements provider_interface {
         }
     }
 
+    /**
+     * Method extract_text.
+     *
+     * @param array $content Parameter content.
+     * @return string Return value.
+     */
     private function extract_text(array $content): string {
         $parts = [];
         foreach ($content as $block) {
@@ -307,6 +407,12 @@ final class bridge implements provider_interface {
         return implode("\n", $parts);
     }
 
+    /**
+     * Method contains_line_break.
+     *
+     * @param string $value Parameter value.
+     * @return bool Return value.
+     */
     private function contains_line_break(string $value): bool {
         return str_contains($value, "\r") || str_contains($value, "\n");
     }

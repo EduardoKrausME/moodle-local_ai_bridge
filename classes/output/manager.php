@@ -1,9 +1,39 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * manager.php
+ *
+ * @package   local_ai_bridge
+ * @copyright 2026 Eduardo Kraus {@link https://eduardokraus.com}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace local_ai_bridge\output;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * Class manager.
+ */
 final class manager {
+    /**
+     * Method overview.
+     *
+     * @param \stdClass $tenant Parameter tenant.
+     * @return string Return value.
+     */
     public static function overview(\stdClass $tenant): string {
         global $DB;
         $counts = [
@@ -21,6 +51,12 @@ final class manager {
         return $html . \html_writer::alist($items);
     }
 
+    /**
+     * Method purposes.
+     *
+     * @param \stdClass $tenant Parameter tenant.
+     * @return string Return value.
+     */
     public static function purposes(\stdClass $tenant): string {
         global $DB;
         $records = $DB->get_records('local_ai_bridge_purpose', ['tenantid' => $tenant->id], 'name ASC');
@@ -35,6 +71,12 @@ final class manager {
         return $html . \html_writer::table($table);
     }
 
+    /**
+     * Method connections.
+     *
+     * @param \stdClass $tenant Parameter tenant.
+     * @return string Return value.
+     */
     public static function connections(\stdClass $tenant): string {
         global $DB;
         $records = $DB->get_records('local_ai_bridge_connection', ['tenantid' => $tenant->id], 'name ASC');
@@ -49,6 +91,12 @@ final class manager {
         return $html . \html_writer::table($table);
     }
 
+    /**
+     * Method routes.
+     *
+     * @param \stdClass $tenant Parameter tenant.
+     * @return string Return value.
+     */
     public static function routes(\stdClass $tenant): string {
         global $DB;
         $sql = "SELECT r.*, p.name AS purposename, c.name AS connectionname, ar.name AS rolename
@@ -70,6 +118,12 @@ final class manager {
         return $html . \html_writer::table($table);
     }
 
+    /**
+     * Method users.
+     *
+     * @param \stdClass $tenant Parameter tenant.
+     * @return string Return value.
+     */
     public static function users(\stdClass $tenant): string {
         global $DB;
         $mode = get_config('local_ai_bridge', 'tenantkey') ?: 'institution_department';
@@ -102,6 +156,12 @@ final class manager {
         return \html_writer::table($table) . \html_writer::tag('p', get_string('usershint', 'local_ai_bridge'), ['class' => 'text-muted']);
     }
 
+    /**
+     * Method roles.
+     *
+     * @param \stdClass $tenant Parameter tenant.
+     * @return string Return value.
+     */
     public static function roles(\stdClass $tenant): string {
         global $DB;
         $records = $DB->get_records('local_ai_bridge_role', ['tenantid' => $tenant->id], 'name ASC');
@@ -115,6 +175,12 @@ final class manager {
         return $html . \html_writer::table($table);
     }
 
+    /**
+     * Method admins.
+     *
+     * @param \stdClass $tenant Parameter tenant.
+     * @return string Return value.
+     */
     public static function admins(\stdClass $tenant): string {
         global $DB, $USER;
         $context = \context_system::instance();
@@ -137,6 +203,12 @@ final class manager {
         return $html . \html_writer::table($table);
     }
 
+    /**
+     * Method credits.
+     *
+     * @param \stdClass $tenant Parameter tenant.
+     * @return string Return value.
+     */
     public static function credits(\stdClass $tenant): string {
         global $DB;
         $url = new \moodle_url('/local/ai_bridge/credits.php', ['tenantid' => $tenant->id]);
@@ -151,6 +223,12 @@ final class manager {
         return $html . \html_writer::table($table);
     }
 
+    /**
+     * Method stats.
+     *
+     * @param \stdClass $tenant Parameter tenant.
+     * @return string Return value.
+     */
     public static function stats(\stdClass $tenant): string {
         global $DB, $USER;
         $context = \context_system::instance();

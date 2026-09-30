@@ -1,18 +1,75 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * bridge.php
+ *
+ * @package   aibridge_ollama
+ * @copyright 2026 Eduardo Kraus {@link https://eduardokraus.com}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace aibridge_ollama;
 
-defined('MOODLE_INTERNAL') || die();
 use local_ai_bridge\local\bridge\provider_interface;
 use local_ai_bridge\local\bridge\request;
 use local_ai_bridge\local\bridge\response;
 use local_ai_bridge\local\security\url_guard;
 
+/**
+ * Class bridge.
+ */
 final class bridge implements provider_interface {
+    /**
+     * Method get_component.
+     *
+     * @return string Return value.
+     */
     public function get_component(): string { return 'aibridge_ollama'; }
+    /**
+     * Method get_name.
+     *
+     * @return string Return value.
+     */
     public function get_name(): string { return get_string('pluginname', 'aibridge_ollama'); }
+    /**
+     * Method get_description.
+     *
+     * @return string Return value.
+     */
     public function get_description(): string { return get_string('description', 'aibridge_ollama'); }
+    /**
+     * Method get_default_config.
+     *
+     * @return array Return value.
+     */
     public function get_default_config(): array { return ['baseurl' => 'http://localhost:11434', 'timeout' => 120, 'apikey' => '']; }
+    /**
+     * Method get_secret_fields.
+     *
+     * @return array Return value.
+     */
     public function get_secret_fields(): array { return ['apikey']; }
+    /**
+     * Method add_config_form_elements.
+     *
+     * @param \MoodleQuickForm $mform Parameter mform.
+     * @param string $prefix Parameter prefix.
+     * @return void Return value.
+     */
     public function add_config_form_elements(\MoodleQuickForm $mform, string $prefix): void {
         $mform->addElement('text', $prefix . 'baseurl', get_string('baseurl', 'aibridge_ollama'));
         $mform->setType($prefix . 'baseurl', PARAM_URL);
@@ -21,11 +78,25 @@ final class bridge implements provider_interface {
         $mform->addElement('text', $prefix . 'timeout', get_string('timeout', 'aibridge_ollama'));
         $mform->setType($prefix . 'timeout', PARAM_INT);
     }
+    /**
+     * Method validate_config.
+     *
+     * @param array $config Parameter config.
+     * @return array Return value.
+     */
     public function validate_config(array $config): array {
         $errors = [];
         if ($error = url_guard::validate((string)($config['baseurl'] ?? ''))) { $errors['baseurl'] = $error; }
         return $errors;
     }
+    /**
+     * Method generate.
+     *
+     * @param request $request Parameter request.
+     * @param array $config Parameter config.
+     * @param string $model Parameter model.
+     * @return response Return value.
+     */
     public function generate(request $request, array $config, string $model): response {
         $baseurl = rtrim((string)$config['baseurl'], '/');
         if ($error = url_guard::validate($baseurl)) { throw new \moodle_exception('error:invalidendpoint', 'local_ai_bridge'); }
