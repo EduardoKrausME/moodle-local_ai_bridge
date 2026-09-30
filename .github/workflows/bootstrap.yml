@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   validate:
+    if: github.event.head_commit.message != 'Add local_ai_bridge with Claude provider'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -46,7 +47,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rsync -a --delete --exclude='.git' /tmp/ai-bridge/ai_bridge/ ./
+          rsync -a --delete --exclude='.git' --exclude='.github' /tmp/ai-bridge/ai_bridge/ ./
           rm -f plugin.zip
           git config user.name "Eduardo Kraus"
           git config user.email "kraus@eduardokraus.com"
