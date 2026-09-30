@@ -35,7 +35,7 @@ use MoodleQuickForm;
 /**
  * Class bridge.
  */
-final class bridge implements provider_interface {
+class bridge implements provider_interface {
     /**
      * Method get_component.
      *
@@ -181,7 +181,8 @@ final class bridge implements provider_interface {
         }
         $cost = ($input / 1_000_000) * (float)($config['inputcost'] ?? 0) +
             ($output / 1_000_000) * (float)($config['outputcost'] ?? 0);
-        return new response($text, (string)($data['model'] ?? $model), $input, $output, $total, $cost, ['id' => $data['id'] ?? null]);
+        return new response($text,
+            (string)($data['model'] ?? $model), $input, $output, $total, $cost, ['id' => $data['id'] ?? null]);
     }
 
     /**

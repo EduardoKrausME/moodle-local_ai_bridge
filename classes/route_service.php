@@ -27,7 +27,7 @@ namespace local_ai_bridge;
 /**
  * Class route_service.
  */
-final class route_service {
+class route_service {
     /**
      * Method candidates.
      *

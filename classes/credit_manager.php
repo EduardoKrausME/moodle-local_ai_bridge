@@ -31,7 +31,7 @@ use stdClass;
 /**
  * Class credit_manager.
  */
-final class credit_manager {
+class credit_manager {
     /**
      * Method assert_available.
      *

@@ -37,7 +37,7 @@ use core_privacy\local\request\writer;
 /**
  * Class provider.
  */
-final class provider implements
+class provider implements
     \core_privacy\local\metadata\provider,
     \core_privacy\local\request\plugin\provider,
     core_userlist_provider {
@@ -113,14 +113,19 @@ final class provider implements
         }
         $userid = $contextlist->get_user()->id;
         $data = (object)[
-            'controls' => array_values($DB->get_records('local_ai_bridge_user', ['userid' => $userid])),
-            'usage' => array_values($DB->get_records('local_ai_bridge_usage', ['userid' => $userid], 'timecreated ASC')),
-            'tenantadmin' => array_values($DB->get_records('local_ai_bridge_tenant_admin', ['userid' => $userid])),
-            'credits_as_user' => array_values($DB->get_records('local_ai_bridge_credit', ['userid' => $userid], 'timecreated ASC')),
-            'credits_as_actor' => array_values($DB->get_records('local_ai_bridge_credit', ['actorid' => $userid], 'timecreated ASC')),
+            'controls' => array_values($DB->get_records('local_ai_bridge_user',
+                ['userid' => $userid])),
+            'usage' => array_values($DB->get_records('local_ai_bridge_usage',
+                ['userid' => $userid], 'timecreated ASC')),
+            'tenantadmin' => array_values($DB->get_records('local_ai_bridge_tenant_admin',
+                ['userid' => $userid])),
+            'credits_as_user' => array_values($DB->get_records('local_ai_bridge_credit',
+                ['userid' => $userid], 'timecreated ASC')),
+            'credits_as_actor' => array_values($DB->get_records('local_ai_bridge_credit',
+                ['actorid' => $userid], 'timecreated ASC')),
         ];
         writer::with_context($context)->export_data([
-            get_string('pluginname', 'local_ai_bridge')
+            get_string('pluginname', 'local_ai_bridge'),
         ], $data);
     }
 

@@ -62,7 +62,8 @@ if ($data = $form->get_data()) {
             'enabled' => $data->enabled ? 1 : 0, 'timecreated' => $now, 'timemodified' => $now,
         ]);
     }
-    redirect(new moodle_url('/local/ai_bridge/manage.php', ['tenantid' => $tenantid, 'tab' => 'routes']), get_string('changessaved'));
+    redirect(new moodle_url('/local/ai_bridge/manage.php',
+        ['tenantid' => $tenantid, 'tab' => 'routes']), get_string('changessaved'));
 }
 echo $OUTPUT->header();
 $form->display();

@@ -29,7 +29,7 @@ use stdClass;
 /**
  * Class tenant_resolver.
  */
-final class tenant_resolver {
+class tenant_resolver {
     /**
      * Method resolve_user.
      *

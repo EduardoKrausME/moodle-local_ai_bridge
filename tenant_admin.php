@@ -34,8 +34,10 @@ $tenant = $DB->get_record('local_ai_bridge_tenant', ['id' => $tenantid], '*', MU
 $remove = optional_param('remove', 0, PARAM_INT);
 if ($remove) {
     require_sesskey();
-    $DB->delete_records('local_ai_bridge_tenant_admin', ['tenantid' => $tenantid, 'userid' => $remove]);
-    redirect(new moodle_url('/local/ai_bridge/manage.php', ['tenantid' => $tenantid, 'tab' => 'admins']), get_string('changessaved'));
+    $DB->delete_records('local_ai_bridge_tenant_admin',
+        ['tenantid' => $tenantid, 'userid' => $remove]);
+    redirect(new moodle_url('/local/ai_bridge/manage.php',
+        ['tenantid' => $tenantid, 'tab' => 'admins']), get_string('changessaved'));
 }
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/ai_bridge/tenant_admin.php', ['tenantid' => $tenantid]));
@@ -56,7 +58,8 @@ if ($data = $form->get_data()) {
             'tenantid' => $tenantid, 'userid' => $user->id, 'timecreated' => time(),
         ]);
     }
-    redirect(new moodle_url('/local/ai_bridge/manage.php', ['tenantid' => $tenantid, 'tab' => 'admins']), get_string('changessaved'));
+    redirect(new moodle_url('/local/ai_bridge/manage.php',
+        ['tenantid' => $tenantid, 'tab' => 'admins']), get_string('changessaved'));
 }
 echo $OUTPUT->header();
 $form->display();

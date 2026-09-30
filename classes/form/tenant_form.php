@@ -32,7 +32,7 @@ require_once("{$CFG->libdir}/formslib.php");
 /**
  * Class tenant_form.
  */
-final class tenant_form extends moodleform {
+class tenant_form extends moodleform {
     /**
      * Method definition.
      *

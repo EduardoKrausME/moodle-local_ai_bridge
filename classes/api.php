@@ -35,7 +35,7 @@ use Throwable;
 /**
  * Class api.
  */
-final class api {
+class api {
     /**
      * Generate text through the configured bridge for a tenant, purpose and logical role.
      *
@@ -45,7 +45,7 @@ final class api {
      * @param array $options Optional request options passed through to the provider.
      */
     public static function generate(string $purposeidnumber, array|string $messages, ?int $userid = null,
-                                    array  $options = []): response {
+                                    array $options = []): response {
         global $DB, $USER;
         $userid ??= (int)$USER->id;
         $context = context_system::instance();

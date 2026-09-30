@@ -29,7 +29,7 @@ use stdClass;
 /**
  * Class tenant_service.
  */
-final class tenant_service {
+class tenant_service {
     /**
      * Method create.
      *

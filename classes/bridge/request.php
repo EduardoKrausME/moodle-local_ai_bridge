@@ -27,7 +27,7 @@ namespace local_ai_bridge\bridge;
 /**
  * Class request.
  */
-final class request {
+class request {
     /**
      * Method __construct.
      *

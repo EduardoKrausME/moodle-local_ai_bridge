@@ -32,7 +32,7 @@ use Throwable;
 /**
  * Class usage_logger.
  */
-final class usage_logger {
+class usage_logger {
     /**
      * Method success.
      *

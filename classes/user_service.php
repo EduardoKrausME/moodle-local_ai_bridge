@@ -29,7 +29,7 @@ use stdClass;
 /**
  * Class user_service.
  */
-final class user_service {
+class user_service {
     /**
      * Method get_or_create.
      *

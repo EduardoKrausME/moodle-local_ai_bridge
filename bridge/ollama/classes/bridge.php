@@ -35,7 +35,7 @@ use MoodleQuickForm;
 /**
  * Class bridge.
  */
-final class bridge implements provider_interface {
+class bridge implements provider_interface {
     /**
      * Method get_component.
      *
@@ -142,7 +142,8 @@ final class bridge implements provider_interface {
         }
         $curl = new curl();
         $curl->setHeader($headers);
-        $raw = $curl->post($baseurl . '/api/chat', json_encode($payload, JSON_THROW_ON_ERROR), ['CURLOPT_TIMEOUT' => max(1, (int)($config['timeout'] ?? 120))]);
+        $raw = $curl->post($baseurl . '/api/chat', json_encode($payload, JSON_THROW_ON_ERROR),
+            ['CURLOPT_TIMEOUT' => max(1, (int)($config['timeout'] ?? 120))]);
         $info = $curl->get_info();
         $status = (int)($info['http_code'] ?? 0);
         $data = json_decode((string)$raw, true);
@@ -155,6 +156,9 @@ final class bridge implements provider_interface {
         }
         $input = (int)($data['prompt_eval_count'] ?? 0);
         $output = (int)($data['eval_count'] ?? 0);
-        return new response((string)$data['message']['content'], (string)($data['model'] ?? $model), $input, $output, $input + $output, 0.0, []);
+        return new response(
+            (string)$data['message']['content'],
+            (string)($data['model'] ?? $model),
+            $input, $output, $input + $output, 0.0, []);
     }
 }

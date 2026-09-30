@@ -30,7 +30,7 @@ use required_capability_exception;
 /**
  * Class access.
  */
-final class access {
+class access {
     /**
      * Method can_manage_tenant.
      *

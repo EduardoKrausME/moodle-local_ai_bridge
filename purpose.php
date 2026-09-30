@@ -62,7 +62,8 @@ if ($data = $form->get_data()) {
             'timecreated' => $now, 'timemodified' => $now,
         ]);
     }
-    redirect(new moodle_url('/local/ai_bridge/manage.php', ['tenantid' => $tenantid, 'tab' => 'purposes']), get_string('changessaved'));
+    redirect(new moodle_url('/local/ai_bridge/manage.php',
+        ['tenantid' => $tenantid, 'tab' => 'purposes']), get_string('changessaved'));
 }
 echo $OUTPUT->header();
 $form->display();

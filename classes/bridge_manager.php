@@ -33,7 +33,7 @@ use Throwable;
 /**
  * Class bridge_manager.
  */
-final class bridge_manager {
+class bridge_manager {
     /**
      * Method get_bridges.
      *

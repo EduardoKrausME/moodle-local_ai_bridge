@@ -35,7 +35,7 @@ use MoodleQuickForm;
 /**
  * Class bridge.
  */
-final class bridge implements provider_interface {
+class bridge implements provider_interface {
     /**
      * Method get_component.
      *
@@ -69,7 +69,12 @@ final class bridge implements provider_interface {
      * @return array Return value.
      */
     public function get_default_config(): array {
-        return ['baseurl' => 'https://generativelanguage.googleapis.com/v1beta', 'timeout' => 60, 'inputcost' => 0, 'outputcost' => 0];
+        return [
+            'baseurl' => 'https://generativelanguage.googleapis.com/v1beta',
+            'timeout' => 60,
+            'inputcost' => 0,
+            'outputcost' => 0,
+        ];
     }
 
     /**
@@ -140,7 +145,14 @@ final class bridge implements provider_interface {
                 $system[] = $message['content'];
                 continue;
             }
-            $contents[] = ['role' => $message['role'] === 'assistant' ? 'model' : 'user', 'parts' => [['text' => $message['content']]]];
+            $contents[] = [
+                'role' => $message['role'] === 'assistant' ? 'model' : 'user',
+                'parts' => [
+                    [
+                        'text' => $message['content'],
+                    ],
+                ],
+            ];
         }
         $payload = ['contents' => $contents];
         if ($system) {
@@ -159,7 +171,8 @@ final class bridge implements provider_interface {
         $payload = array_replace_recursive($payload, $request->options);
         $curl = new curl();
         $curl->setHeader(['Content-Type: application/json']);
-        $raw = $curl->post($url, json_encode($payload, JSON_THROW_ON_ERROR), ['CURLOPT_TIMEOUT' => max(1, (int)($config['timeout'] ?? 60))]);
+        $raw = $curl->post($url, json_encode($payload, JSON_THROW_ON_ERROR),
+            ['CURLOPT_TIMEOUT' => max(1, (int)($config['timeout'] ?? 60))]);
         $info = $curl->get_info();
         $status = (int)($info['http_code'] ?? 0);
         $data = json_decode((string)$raw, true);
@@ -180,7 +193,9 @@ final class bridge implements provider_interface {
         $input = (int)($usage['promptTokenCount'] ?? 0);
         $output = (int)($usage['candidatesTokenCount'] ?? 0);
         $total = (int)($usage['totalTokenCount'] ?? ($input + $output));
-        $cost = ($input / 1_000_000) * (float)($config['inputcost'] ?? 0) + ($output / 1_000_000) * (float)($config['outputcost'] ?? 0);
+        $cost = ($input / 1_000_000) *
+            (float)($config['inputcost'] ?? 0) + ($output / 1_000_000) *
+            (float)($config['outputcost'] ?? 0);
         return new response(implode("\n", $parts), $model, $input, $output, $total, $cost, []);
     }
 }

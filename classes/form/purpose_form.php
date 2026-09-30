@@ -32,7 +32,7 @@ require_once("{$CFG->libdir}/formslib.php");
 /**
  * Class purpose_form.
  */
-final class purpose_form extends moodleform {
+class purpose_form extends moodleform {
     /**
      * Method definition.
      *

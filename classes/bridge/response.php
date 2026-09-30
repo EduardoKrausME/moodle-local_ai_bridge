@@ -27,7 +27,7 @@ namespace local_ai_bridge\bridge;
 /**
  * Class response.
  */
-final class response {
+class response {
     /**
      * Method __construct.
      *

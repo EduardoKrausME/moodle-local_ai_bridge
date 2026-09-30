@@ -30,7 +30,7 @@ use local_ai_bridge\tenant_service;
 /**
  * Class sync_tenants.
  */
-final class sync_tenants extends scheduled_task {
+class sync_tenants extends scheduled_task {
     /**
      * Method get_name.
      *

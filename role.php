@@ -63,7 +63,8 @@ if ($data = $form->get_data()) {
         ]);
     }
     $transaction->allow_commit();
-    redirect(new moodle_url('/local/ai_bridge/manage.php', ['tenantid' => $tenantid, 'tab' => 'roles']), get_string('changessaved'));
+    redirect(new moodle_url('/local/ai_bridge/manage.php',
+        ['tenantid' => $tenantid, 'tab' => 'roles']), get_string('changessaved'));
 }
 echo $OUTPUT->header();
 $form->display();

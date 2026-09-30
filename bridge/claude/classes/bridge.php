@@ -38,7 +38,7 @@ use MoodleQuickForm;
  * Everything specific to Anthropic lives in this subplugin: authentication, API
  * versioning, payload translation, response parsing, usage accounting and cost estimation.
  */
-final class bridge implements provider_interface {
+class bridge implements provider_interface {
     /**
      * Method get_component.
      *

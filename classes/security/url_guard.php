@@ -27,7 +27,7 @@ namespace local_ai_bridge\security;
 /**
  * Class url_guard.
  */
-final class url_guard {
+class url_guard {
     /**
      * Method validate.
      *
@@ -65,6 +65,8 @@ final class url_guard {
     }
 
     /**
+     * function allowed_endpoints
+     *
      * @return array<int, array{host:string, port:?int, wildcard:bool}>
      */
     public static function allowed_endpoints(): array {

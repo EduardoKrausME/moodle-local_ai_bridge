@@ -32,7 +32,7 @@ require_once("{$CFG->libdir}/formslib.php");
 /**
  * Class route_form.
  */
-final class route_form extends moodleform {
+class route_form extends moodleform {
     /**
      * Method definition.
      *
@@ -51,7 +51,8 @@ final class route_form extends moodleform {
         $roles = ['' => get_string('anyrole', 'local_ai_bridge')] +
             $DB->get_records_menu('local_ai_bridge_role', ['tenantid' => $tenantid, 'enabled' => 1], 'name', 'id,name');
         $mform->addElement('select', 'roleid', get_string('airole', 'local_ai_bridge'), $roles);
-        $connections = $DB->get_records_menu('local_ai_bridge_connection', ['tenantid' => $tenantid, 'enabled' => 1], 'name', 'id,name');
+        $connections = $DB->get_records_menu('local_ai_bridge_connection',
+            ['tenantid' => $tenantid, 'enabled' => 1], 'name', 'id,name');
         $mform->addElement('select', 'connectionid', get_string('connection', 'local_ai_bridge'), $connections);
         $mform->addElement('text', 'model', get_string('model', 'local_ai_bridge'));
         $mform->setType('model', PARAM_TEXT);
