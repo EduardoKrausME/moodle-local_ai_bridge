@@ -22,10 +22,14 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use local_ai_bridge\access;
+
 /**
  * Add AI Bridge navigation for users who can manage their tenant.
  *
  * @param global_navigation $navigation
+ * @throws coding_exception
+ * @throws dml_exception
  */
 function local_ai_bridge_extend_navigation(global_navigation $navigation): void {
     global $USER;
@@ -34,7 +38,7 @@ function local_ai_bridge_extend_navigation(global_navigation $navigation): void 
     }
     $context = context_system::instance();
     if (has_capability('local/ai_bridge:manageall', $context) ||
-            \local_ai_bridge\access::has_any_tenant_admin_assignment((int)$USER->id)) {
+            access::has_any_tenant_admin_assignment((int)$USER->id)) {
         $navigation->add(
             get_string('pluginname', 'local_ai_bridge'),
             new moodle_url('/local/ai_bridge/manage.php'),
