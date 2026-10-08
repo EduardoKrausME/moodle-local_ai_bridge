@@ -84,6 +84,12 @@ jobs:
       with:
         plugin: ./plugin
 
+    - name: Run mandatory .chatgpt finishing pipeline
+      if: ${{ !cancelled() }}
+      run: |
+        git clone --depth 1 https://github.com/EduardoKrausME/moodle-plugin-validate.git validator
+        python3 validator/.chatgpt/run.py ./plugin
+
     - name: Check upgrade savepoints
       if: ${{ !cancelled() }}
       run: moodle-plugin-ci savepoints

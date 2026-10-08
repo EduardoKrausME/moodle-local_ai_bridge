@@ -53,7 +53,8 @@ user credit limits.
 ## Security
 
 Provider configuration is encrypted with Moodle `core\encryption` before it is stored. Prompts and model responses are
-not persisted by the parent plugin.
+not persisted in usage logs. Pending asynchronous requests temporarily store an encrypted prompt payload in Moodle's
+ad hoc task queue until the task is processed.
 
 Custom provider URLs are checked against the global endpoint allowlist. Exact hosts are allowed by default, wildcard
 subdomains require an explicit `*.example.org` entry, and non-standard ports must be listed explicitly, such
@@ -75,6 +76,46 @@ $response = \local_ai_bridge\api::generate(
 
 echo $response->text;
 ```
+
+### Asynchronous requests and callbacks
+
+Long-running generations can run as Moodle ad hoc tasks instead of keeping a web request open. Pass a callback as the fifth
+argument to `api::generate()`. The call immediately returns a request ID, **not** a response object:
+
+```php
+$requestid = \\local_ai_bridge\\api::generate(
+    'course-assistant',
+    'Explain this concept using a practical example.',
+    null,
+    [],
+    [\\local_myplugin\\ai_result_handler::class, 'completed']
+);
+
+// In local/myplugin/classes/ai_result_handler.php:
+class ai_result_handler {
+    public static function completed(
+    ?\\local_ai_bridge\\bridge\\response $response,
+    ?\\Throwable $error,
+    string $requestid
+): void {
+    // Persist the outcome for retrieval by your UI or notify the user.
+    // The callback runs in cron, not in the original web request.
+    }
+}
+```
+
+The callback receives `($response, $error, $requestid)`: on success `$error` is null, and on failure
+`$response` is null. Credits and usage are recorded **before** calling the callback. Requests go through the same
+tenant permissions, route priorities and fallback logic used by synchronous calls. The worker checks permissions and
+credits when the request is actually processed, so failures are also delivered through the callback.
+
+Because Moodle processes the callback in a separate PHP process, it must be a **public static method** expressed as
+`Class::method` or `[Class::class, 'method']`; closures and object methods cannot be queued. Messages and options must
+be JSON-serializable. The queued request payload is encrypted with Moodle's encryption service. Configure cron with
+multiple ad hoc task workers to run requests in parallel; callbacks are not parallel within a single worker.
+Callback exceptions are logged without retrying an already-billed generation.
+
+Omit the callback (or pass `null`) to keep the existing synchronous behavior, returning a `response` directly.
 
 The API resolves the current user tenant, checks tenant/user state and credits, resolves purpose and logical role, tries
 configured routes, delegates the request to the selected `aibridge_*` provider, records usage metadata and debits

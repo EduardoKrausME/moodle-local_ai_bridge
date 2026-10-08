@@ -43,14 +43,19 @@ class api {
      * @param array|string $messages Either a prompt string or normalized chat messages.
      * @param int|null $userid Moodle user id, defaults to current user.
      * @param array $options Optional request options passed through to the provider.
+     * @param callable|null $callback Optional public static callback for asynchronous requests.
+     * @return response|string Synchronous response or async request id when a callback is provided.
      */
     public static function generate(string $purposeidnumber, array|string $messages, ?int $userid = null,
-                                    array $options = []): response {
+                                    array $options = [], ?callable $callback = null): response|string {
         global $DB, $USER;
         $userid ??= (int)$USER->id;
         $context = context_system::instance();
         if (!has_capability('local/ai_bridge:use', $context, $userid)) {
             throw new required_capability_exception($context, 'local/ai_bridge:use', 'nopermissions', '');
+        }
+        if ($callback !== null) {
+            return async_request::enqueue($purposeidnumber, $messages, $userid, $options, $callback);
         }
         $tenant = tenant_resolver::resolve_user($userid);
         if (!$tenant || !$tenant->enabled) {
