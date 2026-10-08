@@ -45,13 +45,6 @@ if ($hassiteconfig) {
         get_string('setting:autocreatetenants_desc', 'local_ai_bridge'),
         0
     ));
-    $settings->add(new admin_setting_configtextarea(
-        'local_ai_bridge/allowedhosts',
-        get_string('setting:allowedhosts', 'local_ai_bridge'),
-        get_string('setting:allowedhosts_desc', 'local_ai_bridge'),
-        "api.openai.com\napi.anthropic.com\ngenerativelanguage.googleapis.com",
-        PARAM_RAW_TRIMMED
-    ));
     $settings->add(new admin_setting_configcheckbox(
         'local_ai_bridge/logfailures',
         get_string('setting:logfailures', 'local_ai_bridge'),
