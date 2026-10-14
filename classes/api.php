@@ -119,13 +119,6 @@ class api {
     }
 
     /**
-     * Method normalize_messages.
-     *
-     * @param array $messages Parameter messages.
-     * @return array Return value.
-     */
-
-    /**
      * Transcribe a Moodle stored audio file through the configured tenant purpose.
      *
      * This deliberately uses the same permissions, routing and credit accounting as
@@ -206,6 +199,12 @@ class api {
         throw new moodle_exception('error:allroutesfailed', 'local_ai_bridge');
     }
 
+    /**
+     * Method normalize_messages.
+     *
+     * @param array $messages Parameter messages.
+     * @return array Return value.
+     */
     private static function normalize_messages(array $messages): array {
         $normalized = [];
         foreach ($messages as $message) {

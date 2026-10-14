@@ -187,14 +187,6 @@ class bridge implements provider_interface, transcription_provider_interface {
     }
 
     /**
-     * Method chat_payload.
-     *
-     * @param request $request Parameter request.
-     * @param string $model Parameter model.
-     * @return array Return value.
-     */
-
-    /**
      * Transcribe an audio recording with the OpenAI Audio Transcriptions endpoint.
      *
      * The configured route model must support /audio/transcriptions, such as
@@ -266,6 +258,13 @@ class bridge implements provider_interface, transcription_provider_interface {
         }
     }
 
+    /**
+     * Method chat_payload.
+     *
+     * @param request $request Parameter request.
+     * @param string $model Parameter model.
+     * @return array Return value.
+     */
     private function chat_payload(request $request, string $model): array {
         $payload = ['model' => $model, 'messages' => $request->messages];
         if ($request->temperature !== null) {
