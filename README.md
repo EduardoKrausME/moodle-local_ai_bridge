@@ -118,6 +118,30 @@ The API resolves the current user tenant, checks tenant/user state and credits, 
 configured routes, delegates the request to the selected `aibridge_*` provider, records usage metadata and debits
 credits only after success.
 
+## Audio transcription
+
+Providers may optionally implement \`local_ai_bridge\bridge\transcription_provider_interface\` without
+changing their existing text-generation contract. The bundled OpenAI bridge now transcribes audio
+using \`POST /audio/transcriptions\`. Configure a purpose (for example \`audioanswer-transcription\`)
+and route it to an OpenAI connection with a transcription model such as \`gpt-4o-mini-transcribe\`
+or \`gpt-4o-transcribe\`. Other providers remain text-only until they implement the optional interface.
+
+\`\`\`php
+$transcript = \local_ai_bridge\api::transcribe(
+    'audioanswer-transcription',
+    $storedfile, // Moodle \stored_file; never a public audio URL.
+    $userid
+);
+echo $transcript->text;
+\`\`\`
+
+The API applies tenant/role routing, the \`local/ai_bridge:use\` permission, quotas, credit
+accounting, logging without audio/text content, and priority fallback to other audio-capable
+routes. Unsupported text-only providers are skipped. Audio is sent to the configured external
+provider, so consuming plugins must obtain appropriate consent/notice and protect stored results.
+The OpenAI provider accepts an optional ISO-639-1 \`language\` option. Provider-specific audio
+pricing is not estimated in the bridge; internal configured purpose credits still apply.
+
 ## Privacy
 
 Usage statistics store user ID, provider, model, token counts, credits, estimated cost, latency and status. The plugin

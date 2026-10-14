@@ -124,6 +124,88 @@ class api {
      * @param array $messages Parameter messages.
      * @return array Return value.
      */
+
+    /**
+     * Transcribe a Moodle stored audio file through the configured tenant purpose.
+     *
+     * This deliberately uses the same permissions, routing and credit accounting as
+     * generate(), but only tries providers implementing the optional audio contract.
+     *
+     * @param string $purposeidnumber Purpose identifier (for example, audioanswer-transcription).
+     * @param \stored_file $audio Private Moodle File API recording.
+     * @param int|null $userid User whose tenant, permissions and credits apply.
+     * @param array $options Provider-specific supported transcription options.
+     * @return response Transcribed text and usage metadata.
+     */
+    public static function transcribe(string $purposeidnumber, \stored_file $audio, ?int $userid = null,
+            array $options = []): response {
+        global $DB, $USER;
+
+        $userid ??= (int)$USER->id;
+        $context = context_system::instance();
+        if (!has_capability('local/ai_bridge:use', $context, $userid)) {
+            throw new required_capability_exception($context, 'local/ai_bridge:use', 'nopermissions', '');
+        }
+        $tenant = tenant_resolver::resolve_user($userid);
+        if (!$tenant || !$tenant->enabled) {
+            throw new moodle_exception('error:notenant', 'local_ai_bridge');
+        }
+        $usercontrol = user_service::get_or_create((int)$tenant->id, $userid);
+        if (!$usercontrol->enabled) {
+            throw new moodle_exception('error:userdisabled', 'local_ai_bridge');
+        }
+        $purpose = $DB->get_record('local_ai_bridge_purpose', [
+            'tenantid' => $tenant->id,
+            'idnumber' => $purposeidnumber,
+            'enabled' => 1,
+        ]);
+        if (!$purpose) {
+            throw new moodle_exception('error:purposeunavailable', 'local_ai_bridge', '', $purposeidnumber);
+        }
+        credit_manager::assert_available($tenant, $usercontrol, (float)$purpose->creditcost);
+        $routes = route_service::candidates((int)$tenant->id, (int)$purpose->id,
+            $usercontrol->roleid ? (int)$usercontrol->roleid : null);
+        if (!$routes) {
+            throw new moodle_exception('error:noroute', 'local_ai_bridge');
+        }
+
+        $last = null;
+        $supported = false;
+        foreach ($routes as $route) {
+            // Text-only bridges cannot be used to transcribe, even when routed first.
+            $bridge = bridge_manager::get_bridge((string)$route->bridge);
+            if (!$bridge instanceof \local_ai_bridge\bridge\transcription_provider_interface) {
+                continue;
+            }
+            $supported = true;
+            $started = hrtime(true);
+            try {
+                $config = bridge_manager::decrypt_config((string)$route->configdata);
+                $response = $bridge->transcribe($audio, $config, (string)$route->model, $options);
+            } catch (Throwable $exception) {
+                $latency = (int)round((hrtime(true) - $started) / 1_000_000);
+                usage_logger::failure($tenant, $userid, $purpose, $usercontrol, $route, $exception, $latency);
+                $last = $exception;
+                continue;
+            }
+
+            // Never retry a paid provider call because usage accounting fails.
+            $latency = (int)round((hrtime(true) - $started) / 1_000_000);
+            $transaction = $DB->start_delegated_transaction();
+            $usageid = usage_logger::success($tenant, $userid, $purpose, $usercontrol, $route, $response, $latency);
+            credit_manager::debit((int)$tenant->id, $userid, $usageid, (float)$purpose->creditcost);
+            $transaction->allow_commit();
+            return $response;
+        }
+        if (!$supported) {
+            throw new moodle_exception('error:noroute', 'local_ai_bridge');
+        }
+        if ($last instanceof moodle_exception) {
+            throw $last;
+        }
+        throw new moodle_exception('error:allroutesfailed', 'local_ai_bridge');
+    }
+
     private static function normalize_messages(array $messages): array {
         $normalized = [];
         foreach ($messages as $message) {

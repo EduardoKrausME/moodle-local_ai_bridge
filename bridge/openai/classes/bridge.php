@@ -28,6 +28,7 @@ use curl;
 use local_ai_bridge\bridge\provider_interface;
 use local_ai_bridge\bridge\request;
 use local_ai_bridge\bridge\response;
+use local_ai_bridge\bridge\transcription_provider_interface;
 use local_ai_bridge\security\url_guard;
 use moodle_exception;
 use MoodleQuickForm;
@@ -35,7 +36,7 @@ use MoodleQuickForm;
 /**
  * Class bridge.
  */
-class bridge implements provider_interface {
+class bridge implements provider_interface, transcription_provider_interface {
     /**
      * Method get_component.
      *
@@ -192,6 +193,79 @@ class bridge implements provider_interface {
      * @param string $model Parameter model.
      * @return array Return value.
      */
+
+    /**
+     * Transcribe an audio recording with the OpenAI Audio Transcriptions endpoint.
+     *
+     * The configured route model must support /audio/transcriptions, such as
+     * gpt-4o-mini-transcribe, gpt-4o-transcribe or whisper-1.
+     *
+     * @param \stored_file $audio Recording from Moodle's private File API.
+     * @param array $config Decrypted connection settings.
+     * @param string $model Model configured for the transcription route.
+     * @param array $options Optional ISO-639-1 language hint.
+     * @return response Transcript and provider usage.
+     */
+    public function transcribe(\stored_file $audio, array $config, string $model,
+            array $options = []): response {
+        $baseurl = rtrim((string)($config['baseurl'] ?? ''), '/');
+        if ($error = url_guard::validate($baseurl)) {
+            throw new moodle_exception('error:invalidendpoint', 'local_ai_bridge');
+        }
+        if ($audio->get_filesize() <= 0 || $audio->get_filesize() > 25 * 1024 * 1024) {
+            throw new moodle_exception('error:request', 'aibridge_openai', '', 'Unsupported audio size');
+        }
+
+        $tempdir = make_temp_directory('local_ai_bridge');
+        $temppath = tempnam($tempdir, 'audio_');
+        if ($temppath === false) {
+            throw new \RuntimeException('Could not prepare temporary audio file.');
+        }
+        try {
+            if (!$audio->copy_content_to($temppath)) {
+                throw new \RuntimeException('Could not read stored audio.');
+            }
+            $file = new \CURLFile($temppath, $audio->get_mimetype(), $audio->get_filename());
+            $params = [
+                'file' => $file,
+                'model' => $model,
+                'response_format' => 'json',
+            ];
+            if (isset($options['language']) && preg_match('/^[a-z]{2}$/', (string)$options['language'])) {
+                $params['language'] = (string)$options['language'];
+            }
+            $headers = ['Authorization: Bearer ' . $config['apikey']];
+            if (!empty($config['project'])) {
+                $headers[] = 'OpenAI-Project: ' . $config['project'];
+            }
+            if (!empty($config['organization'])) {
+                $headers[] = 'OpenAI-Organization: ' . $config['organization'];
+            }
+
+            // An array containing CURLFile makes Moodle curl send multipart/form-data.
+            // Do not set application/json or a manual multipart boundary here.
+            $curl = new curl();
+            $curl->setHeader($headers);
+            $raw = $curl->post($baseurl . '/audio/transcriptions', $params,
+                ['CURLOPT_TIMEOUT' => max(1, (int)($config['timeout'] ?? 60))]);
+            $status = (int)($curl->get_info()['http_code'] ?? 0);
+            if ($status < 200 || $status >= 300) {
+                throw new moodle_exception('error:request', 'aibridge_openai', '', 'HTTP ' . $status);
+            }
+            $data = json_decode((string)$raw, true);
+            if (!is_array($data) || !isset($data['text']) || !is_string($data['text'])) {
+                throw new moodle_exception('error:response', 'aibridge_openai');
+            }
+            $usage = is_array($data['usage'] ?? null) ? $data['usage'] : [];
+            $input = (int)($usage['input_tokens'] ?? 0);
+            $output = (int)($usage['output_tokens'] ?? 0);
+            $total = (int)($usage['total_tokens'] ?? ($input + $output));
+            return new response($data['text'], $model, $input, $output, $total, 0.0);
+        } finally {
+            @unlink($temppath);
+        }
+    }
+
     private function chat_payload(request $request, string $model): array {
         $payload = ['model' => $model, 'messages' => $request->messages];
         if ($request->temperature !== null) {
