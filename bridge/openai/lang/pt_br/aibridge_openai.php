@@ -24,8 +24,8 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string["privacy:metadata:external"] = "O endpoint OpenAI ou compatível configurado recebe mensagens, instruções de sistema e, opcionalmente, gravações de áudio para transcrição.";
-$string["privacy:metadata:external:audio"] = "A gravação de áudio é transmitida ao provedor para transcrição.";
-$string["privacy:metadata:external:language"] = "Uma indicação opcional de idioma é transmitida na solicitação de transcrição.";
-$string["privacy:metadata:external:messages"] = "O texto das mensagens de usuários e assistentes é transmitido para geração.";
-$string["privacy:metadata:external:systeminstruction"] = "Instruções de sistema, que podem conter dados pessoais, são transmitidas para geração.";
+$string['privacy:metadata:external'] = 'O endpoint OpenAI ou compatível configurado recebe mensagens, instruções de sistema e, opcionalmente, gravações de áudio para transcrição.';
+$string['privacy:metadata:external:audio'] = 'A gravação de áudio é transmitida ao provedor para transcrição.';
+$string['privacy:metadata:external:language'] = 'Uma indicação opcional de idioma é transmitida na solicitação de transcrição.';
+$string['privacy:metadata:external:messages'] = 'O texto das mensagens de usuários e assistentes é transmitido para geração.';
+$string['privacy:metadata:external:systeminstruction'] = 'Instruções de sistema, que podem conter dados pessoais, são transmitidas para geração.';

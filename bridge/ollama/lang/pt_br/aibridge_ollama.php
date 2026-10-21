@@ -24,6 +24,6 @@
 
 defined("MOODLE_INTERNAL") || die();
 
-$string["privacy:metadata:external"] = "O endpoint Ollama autohospedado configurado recebe mensagens e instruções de sistema.";
-$string["privacy:metadata:external:messages"] = "O texto das mensagens de usuários e assistentes é transmitido para geração.";
-$string["privacy:metadata:external:systeminstruction"] = "Instruções de sistema, que podem conter dados pessoais, são transmitidas para geração.";
+$string['privacy:metadata:external'] = 'O endpoint Ollama autohospedado configurado recebe mensagens e instruções de sistema.';
+$string['privacy:metadata:external:messages'] = 'O texto das mensagens de usuários e assistentes é transmitido para geração.';
+$string['privacy:metadata:external:systeminstruction'] = 'Instruções de sistema, que podem conter dados pessoais, são transmitidas para geração.';
