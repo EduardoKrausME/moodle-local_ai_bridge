@@ -31,18 +31,40 @@ $tenantid = required_param('tenantid', PARAM_INT);
 $context = context_system::instance();
 require_capability('local/ai_bridge:managetenants', $context);
 $tenant = $DB->get_record('local_ai_bridge_tenant', ['id' => $tenantid], '*', MUST_EXIST);
-$remove = optional_param('remove', 0, PARAM_INT);
-if ($remove) {
-    require_sesskey();
-    $DB->delete_records('local_ai_bridge_tenant_admin',
-        ['tenantid' => $tenantid, 'userid' => $remove]);
-    redirect(new moodle_url('/local/ai_bridge/manage.php',
-        ['tenantid' => $tenantid, 'tab' => 'admins']), get_string('changessaved'));
-}
 $PAGE->set_context($context);
-$PAGE->set_url(new moodle_url('/local/ai_bridge/tenant_admin.php', ['tenantid' => $tenantid]));
-$PAGE->set_title(get_string('addtenantadmin', 'local_ai_bridge'));
+$PAGE->set_url(new moodle_url("/local/ai_bridge/tenant_admin.php", ["tenantid" => $tenantid]));
+$PAGE->set_title(get_string("addtenantadmin", "local_ai_bridge"));
 $PAGE->set_heading(format_string($tenant->name));
+$remove = optional_param("remove", 0, PARAM_INT);
+if ($remove) {
+    $assignment = $DB->get_record("local_ai_bridge_tenant_admin",
+        ["tenantid" => $tenantid, "userid" => $remove], "*", MUST_EXIST);
+    $adminuser = $DB->get_record("user", ["id" => $remove, "deleted" => 0], "*", MUST_EXIST);
+    if (data_submitted()) {
+        require_sesskey();
+        $DB->delete_records("local_ai_bridge_tenant_admin", ["id" => $assignment->id]);
+        \local_ai_bridge\event\tenant_admin_removed::create([
+            "context" => $context,
+            "objectid" => $assignment->id,
+            "relateduserid" => $remove,
+            "other" => ["tenantid" => $tenantid],
+        ])->trigger();
+        redirect(new moodle_url("/local/ai_bridge/manage.php",
+            ["tenantid" => $tenantid, "tab" => "admins"]), get_string("changessaved"));
+    }
+    $yesurl = new moodle_url("/local/ai_bridge/tenant_admin.php",
+        ["tenantid" => $tenantid, "remove" => $remove]);
+    $cancelurl = new moodle_url("/local/ai_bridge/manage.php",
+        ["tenantid" => $tenantid, "tab" => "admins"]);
+    echo $OUTPUT->header();
+    echo $OUTPUT->confirm(
+        get_string("confirmremoveadmin", "local_ai_bridge", fullname($adminuser)),
+        new single_button($yesurl, get_string("remove"), "post"),
+        $cancelurl
+    );
+    echo $OUTPUT->footer();
+    exit;
+}
 $form = new tenant_admin_form();
 $form->set_data(['tenantid' => $tenantid]);
 if ($form->is_cancelled()) {
@@ -54,9 +76,15 @@ if ($data = $form->get_data()) {
         throw new moodle_exception('error:usernotfound', 'local_ai_bridge');
     }
     if (!$DB->record_exists('local_ai_bridge_tenant_admin', ['tenantid' => $tenantid, 'userid' => $user->id])) {
-        $DB->insert_record('local_ai_bridge_tenant_admin', (object)[
-            'tenantid' => $tenantid, 'userid' => $user->id, 'timecreated' => time(),
+        $assignmentid = $DB->insert_record("local_ai_bridge_tenant_admin", (object)[
+            "tenantid" => $tenantid, "userid" => $user->id, "timecreated" => time(),
         ]);
+        \local_ai_bridge\event\tenant_admin_added::create([
+            "context" => $context,
+            "objectid" => $assignmentid,
+            "relateduserid" => $user->id,
+            "other" => ["tenantid" => $tenantid],
+        ])->trigger();
     }
     redirect(new moodle_url('/local/ai_bridge/manage.php',
         ['tenantid' => $tenantid, 'tab' => 'admins']), get_string('changessaved'));

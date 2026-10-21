@@ -222,8 +222,8 @@ class credit_manager {
                 'timecreated' => time(),
             ]);
             $transaction->allow_commit();
-            \\local_ai_bridge\\event\\credit_adjusted::create([
-                "context" => \\context_system::instance(),
+            \local_ai_bridge\event\credit_adjusted::create([
+                "context" => \context_system::instance(),
                 "objectid" => $creditid,
                 "other" => ["tenantid" => $tenantid, "amount" => $amount],
             ])->trigger();

@@ -275,7 +275,7 @@ class manager {
         $table->head = [get_string('fullname'), get_string('email'), get_string('actions')];
         foreach ($records as $record) {
             $remove = new moodle_url('/local/ai_bridge/tenant_admin.php',
-                ['tenantid' => $tenant->id, 'remove' => $record->id, 'sesskey' => sesskey()]);
+                ['tenantid' => $tenant->id, 'remove' => $record->id]);
             $table->data[] = [fullname($record), s($record->email), html_writer::link($remove, get_string('remove'))];
         }
         return $html . html_writer::table($table);

@@ -148,3 +148,9 @@ $string["setting:allowprivatehosts_desc"] = "Permite conexões a endereços de l
 $string["setting:disableai"] = "Desativar todas as chamadas de IA";
 $string["setting:disableai_desc"] = "Interruptor de emergência: rejeita novas solicitações de geração e transcrição.";
 $string["error:aicallsdisabled"] = "As solicitações de IA foram desativadas pelo administrador do site.";
+
+$string["confirmremoveadmin"] = "Remover {$a} dos administradores deste tenant?";
+$string["event:connectionchanged"] = "Conexão de provedor de IA alterada";
+$string["event:creditadjusted"] = "Créditos do tenant ajustados";
+$string["event:tenantadminadded"] = "Administrador do tenant adicionado";
+$string["event:tenantadminremoved"] = "Administrador do tenant removido";

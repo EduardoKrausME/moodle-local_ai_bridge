@@ -83,13 +83,19 @@ if ($data = $form->get_data()) {
         $record->enabled = $data->enabled ? 1 : 0;
         $record->timemodified = $now;
         $DB->update_record('local_ai_bridge_connection', $record);
+        $connectionid = (int)$record->id;
     } else {
-        $DB->insert_record('local_ai_bridge_connection', (object)[
+        $connectionid = $DB->insert_record('local_ai_bridge_connection', (object)[
             'tenantid' => $tenantid, 'name' => $data->name, 'bridge' => $bridgename,
             'configdata' => bridge_manager::encrypt_config($config), 'enabled' => $data->enabled ? 1 : 0,
             'timecreated' => $now, 'timemodified' => $now,
         ]);
     }
+    \local_ai_bridge\event\connection_changed::create([
+        "context" => context_system::instance(),
+        "objectid" => $connectionid,
+        "other" => ["tenantid" => $tenantid, "operation" => $record ? "updated" : "created"],
+    ])->trigger();
     redirect(new moodle_url('/local/ai_bridge/manage.php',
         ['tenantid' => $tenantid, 'tab' => 'connections']), get_string('changessaved'));
 }
