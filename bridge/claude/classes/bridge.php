@@ -220,9 +220,9 @@ class bridge implements provider_interface {
         if ($status < 200 || $status >= 300) {
             $message = 'HTTP ' . $status;
             if (is_array($data)) {
-                $message = (string)($data['error']['message'] ?? $data['message'] ?? \\local_ai_bridge\\security\\provider_error::safe($message));
+                $message = (string)($data['error']['message'] ?? $data['message'] ?? \local_ai_bridge\security\provider_error::safe($message));
             }
-            throw new moodle_exception('error:request', 'aibridge_claude', '', \\local_ai_bridge\\security\\provider_error::safe($message));
+            throw new moodle_exception('error:request', 'aibridge_claude', '', \local_ai_bridge\security\provider_error::safe($message));
         }
 
         if (!is_array($data) || !isset($data['content']) || !is_array($data['content'])) {
@@ -316,7 +316,7 @@ class bridge implements provider_interface {
         // Temperature is intentionally not copied automatically. Anthropic has deprecated
         // it for newer Claude models. Advanced callers can still add it explicitly through
         // request options when targeting a model that supports it.
-        return $payload + \\local_ai_bridge\\security\\request_options::filter("claude", $request->options);
+        return $payload + \local_ai_bridge\security\request_options::filter("claude", $request->options);
     }
 
     /**

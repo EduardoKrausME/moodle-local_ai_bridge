@@ -164,7 +164,7 @@ class bridge implements provider_interface, transcription_provider_interface {
         $data = json_decode((string)$raw, true);
         if ($status < 200 || $status >= 300) {
             $message = is_array($data) ? (string)($data['error']['message'] ?? 'HTTP ' . $status) : 'HTTP ' . $status;
-            throw new moodle_exception('error:request', 'aibridge_openai', '', \\local_ai_bridge\\security\\provider_error::safe($message));
+            throw new moodle_exception('error:request', 'aibridge_openai', '', \local_ai_bridge\security\provider_error::safe($message));
         }
         if (!is_array($data)) {
             throw new moodle_exception('error:response', 'aibridge_openai');
@@ -273,7 +273,7 @@ class bridge implements provider_interface, transcription_provider_interface {
         if ($request->maxoutputtokens !== null) {
             $payload['max_completion_tokens'] = $request->maxoutputtokens;
         }
-        return $payload + \\local_ai_bridge\\security\\request_options::filter("openai", $request->options);
+        return $payload + \local_ai_bridge\security\request_options::filter("openai", $request->options);
     }
 
     /**
@@ -291,7 +291,7 @@ class bridge implements provider_interface, transcription_provider_interface {
         if ($request->maxoutputtokens !== null) {
             $payload['max_output_tokens'] = $request->maxoutputtokens;
         }
-        return $payload + \\local_ai_bridge\\security\\request_options::filter("openai", $request->options);
+        return $payload + \local_ai_bridge\security\request_options::filter("openai", $request->options);
     }
 
     /**
