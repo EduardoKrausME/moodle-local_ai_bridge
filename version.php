@@ -24,8 +24,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2026101501;
-$plugin->release = '1.2.2';
+$plugin->version = 2026102000;
+$plugin->release = '1.2.3';
 $plugin->component = 'local_ai_bridge';
 $plugin->requires = 2024100700;
 $plugin->maturity = MATURITY_STABLE;
