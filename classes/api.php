@@ -54,9 +54,6 @@ class api {
         if ($userid !== (int)$USER->id && !has_capability("local/ai_bridge:manageall", $context, (int)$USER->id)) {
             throw new required_capability_exception($context, "local/ai_bridge:manageall", "nopermissions", "");
         }
-        if ($userid !== (int)$USER->id && !has_capability("local/ai_bridge:manageall", $context, (int)$USER->id)) {
-            throw new required_capability_exception($context, "local/ai_bridge:manageall", "nopermissions", "");
-        }
         if (get_config("local_ai_bridge", "disableai")) {
             throw new moodle_exception("error:aicallsdisabled", "local_ai_bridge");
         }
@@ -107,38 +104,38 @@ class api {
         credit_manager::reserve((int)$tenant->id, $userid, $credits);
         $settled = false;
         try {
-        $last = null;
-        foreach ($routes as $route) {
-            $started = hrtime(true);
-            try {
-                $bridge = bridge_manager::get_bridge((string)$route->bridge);
-                $config = bridge_manager::decrypt_config((string)$route->configdata);
-                $response = $bridge->generate($request, $config, (string)$route->model);
-            } catch (Throwable $e) {
-                $latency = (int)round((hrtime(true) - $started) / 1_000_000);
-                usage_logger::failure($tenant, $userid, $purpose, $usercontrol, $route, $e, $latency);
-                $last = $e;
-                continue;
-            }
+            $last = null;
+            foreach ($routes as $route) {
+                $started = hrtime(true);
+                try {
+                    $bridge = bridge_manager::get_bridge((string)$route->bridge);
+                    $config = bridge_manager::decrypt_config((string)$route->configdata);
+                    $response = $bridge->generate($request, $config, (string)$route->model);
+                } catch (Throwable $e) {
+                    $latency = (int)round((hrtime(true) - $started) / 1_000_000);
+                    usage_logger::failure($tenant, $userid, $purpose, $usercontrol, $route, $e, $latency);
+                    $last = $e;
+                    continue;
+                }
 
-            // Never retry a provider after it returned successfully. If accounting fails,
-            // propagate the accounting error instead of issuing a duplicate paid request.
-            $latency = (int)round((hrtime(true) - $started) / 1_000_000);
-            $transaction = $DB->start_delegated_transaction();
-            try {
-                $usageid = usage_logger::success($tenant, $userid, $purpose, $usercontrol, $route, $response, $latency);
-                credit_manager::record_reserved_usage((int)$tenant->id, $userid, $usageid, $credits);
-                $transaction->allow_commit();
-            } catch (Throwable $exception) {
-                $transaction->rollback($exception);
+                // Never retry a provider after it returned successfully. If accounting fails,
+                // propagate the accounting error instead of issuing a duplicate paid request.
+                $latency = (int)round((hrtime(true) - $started) / 1_000_000);
+                $transaction = $DB->start_delegated_transaction();
+                try {
+                    $usageid = usage_logger::success($tenant, $userid, $purpose, $usercontrol, $route, $response, $latency);
+                    credit_manager::record_reserved_usage((int)$tenant->id, $userid, $usageid, $credits);
+                    $transaction->allow_commit();
+                } catch (Throwable $exception) {
+                    $transaction->rollback($exception);
+                }
+                $settled = true;
+                return $response;
             }
-            $settled = true;
-            return $response;
-        }
-        if ($last instanceof moodle_exception) {
-            throw $last;
-        }
-        throw new moodle_exception('error:allroutesfailed', 'local_ai_bridge');
+            if ($last instanceof moodle_exception) {
+                throw $last;
+            }
+            throw new moodle_exception('error:allroutesfailed', 'local_ai_bridge');
         } finally {
             if (!$settled) {
                 credit_manager::release((int)$tenant->id, $userid, $credits);
@@ -164,6 +161,9 @@ class api {
 
         $userid ??= (int)$USER->id;
         $context = context_system::instance();
+        if ($userid !== (int)$USER->id && !has_capability("local/ai_bridge:manageall", $context, (int)$USER->id)) {
+            throw new required_capability_exception($context, "local/ai_bridge:manageall", "nopermissions", "");
+        }
         if (get_config("local_ai_bridge", "disableai")) {
             throw new moodle_exception("error:aicallsdisabled", "local_ai_bridge");
         }
@@ -202,46 +202,46 @@ class api {
         credit_manager::reserve((int)$tenant->id, $userid, $credits);
         $settled = false;
         try {
-        $last = null;
-        $supported = false;
-        foreach ($routes as $route) {
-            // Text-only bridges cannot be used to transcribe, even when routed first.
-            $bridge = bridge_manager::get_bridge((string)$route->bridge);
-            if (!$bridge instanceof \local_ai_bridge\bridge\transcription_provider_interface) {
-                continue;
-            }
-            $supported = true;
-            $started = hrtime(true);
-            try {
-                $config = bridge_manager::decrypt_config((string)$route->configdata);
-                $response = $bridge->transcribe($audio, $config, (string)$route->model, $options);
-            } catch (Throwable $exception) {
-                $latency = (int)round((hrtime(true) - $started) / 1_000_000);
-                usage_logger::failure($tenant, $userid, $purpose, $usercontrol, $route, $exception, $latency);
-                $last = $exception;
-                continue;
-            }
+            $last = null;
+            $supported = false;
+            foreach ($routes as $route) {
+                // Text-only bridges cannot be used to transcribe, even when routed first.
+                $bridge = bridge_manager::get_bridge((string)$route->bridge);
+                if (!$bridge instanceof \local_ai_bridge\bridge\transcription_provider_interface) {
+                    continue;
+                }
+                $supported = true;
+                $started = hrtime(true);
+                try {
+                    $config = bridge_manager::decrypt_config((string)$route->configdata);
+                    $response = $bridge->transcribe($audio, $config, (string)$route->model, $options);
+                } catch (Throwable $exception) {
+                    $latency = (int)round((hrtime(true) - $started) / 1_000_000);
+                    usage_logger::failure($tenant, $userid, $purpose, $usercontrol, $route, $exception, $latency);
+                    $last = $exception;
+                    continue;
+                }
 
-            // Never retry a paid provider call because usage accounting fails.
-            $latency = (int)round((hrtime(true) - $started) / 1_000_000);
-            $transaction = $DB->start_delegated_transaction();
-            try {
-                $usageid = usage_logger::success($tenant, $userid, $purpose, $usercontrol, $route, $response, $latency);
-                credit_manager::record_reserved_usage((int)$tenant->id, $userid, $usageid, $credits);
-                $transaction->allow_commit();
-            } catch (Throwable $exception) {
-                $transaction->rollback($exception);
+                // Never retry a paid provider call because usage accounting fails.
+                $latency = (int)round((hrtime(true) - $started) / 1_000_000);
+                $transaction = $DB->start_delegated_transaction();
+                try {
+                    $usageid = usage_logger::success($tenant, $userid, $purpose, $usercontrol, $route, $response, $latency);
+                    credit_manager::record_reserved_usage((int)$tenant->id, $userid, $usageid, $credits);
+                    $transaction->allow_commit();
+                } catch (Throwable $exception) {
+                    $transaction->rollback($exception);
+                }
+                $settled = true;
+                return $response;
             }
-            $settled = true;
-            return $response;
-        }
-        if (!$supported) {
-            throw new moodle_exception('error:noroute', 'local_ai_bridge');
-        }
-        if ($last instanceof moodle_exception) {
-            throw $last;
-        }
-        throw new moodle_exception('error:allroutesfailed', 'local_ai_bridge');
+            if (!$supported) {
+                throw new moodle_exception('error:noroute', 'local_ai_bridge');
+            }
+            if ($last instanceof moodle_exception) {
+                throw $last;
+            }
+            throw new moodle_exception('error:allroutesfailed', 'local_ai_bridge');
         } finally {
             if (!$settled) {
                 credit_manager::release((int)$tenant->id, $userid, $credits);
