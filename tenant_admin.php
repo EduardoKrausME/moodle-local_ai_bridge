@@ -49,7 +49,7 @@ if ($form->is_cancelled()) {
     redirect(new moodle_url('/local/ai_bridge/manage.php', ['tenantid' => $tenantid, 'tab' => 'admins']));
 }
 if ($data = $form->get_data()) {
-    $user = $DB->get_record('user', ['email' => core_text::strtolower(trim($data->email)), 'deleted' => 0]);
+    $user = $DB->get_record('user', ['email' => strtolower(trim($data->email)), 'deleted' => 0]);
     if (!$user) {
         throw new moodle_exception('error:usernotfound', 'local_ai_bridge');
     }

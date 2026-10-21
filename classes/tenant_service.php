@@ -103,7 +103,7 @@ class tenant_service {
         }
         $parts = array_filter([$institution, $department], static fn($value) => trim((string)$value) !== '');
         $name = implode(' / ', $parts);
-        $idbase = clean_param(core_text::strtolower($name), PARAM_ALPHANUMEXT);
+        $idbase = clean_param(strtolower($name), PARAM_ALPHANUMEXT);
         $idbase = trim(str_replace(' ', '-', $idbase), '-');
         if ($idbase === '') {
             $idbase = 'tenant';
