@@ -96,7 +96,6 @@ class credit_manager {
             throw new moodle_exception("error:creditlock", "local_ai_bridge");
         }
         try {
-            $transaction = $DB->start_delegated_transaction();
             $tenant = $DB->get_record("local_ai_bridge_tenant", ["id" => $tenantid], "*", MUST_EXIST);
             $user = $DB->get_record("local_ai_bridge_user",
                 ["tenantid" => $tenantid, "userid" => $userid], "*", MUST_EXIST);
@@ -106,6 +105,8 @@ class credit_manager {
                 }
                 self::assert_available($tenant, $user, $credits);
             }
+            // Check quota before opening a transaction to preserve any caller transaction.
+            $transaction = $DB->start_delegated_transaction();
             $tenant->creditbalance = (float)$tenant->creditbalance - $credits;
             $tenant->timemodified = time();
             $DB->update_record("local_ai_bridge_tenant", $tenant);
