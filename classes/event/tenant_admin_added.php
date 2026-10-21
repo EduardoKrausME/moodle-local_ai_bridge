@@ -40,6 +40,8 @@ class tenant_admin_added extends \core\event\base {
     }
 
     /**
+     * Return the localized audit event name.
+     *
      * @return string Localized event name.
      */
     public static function get_name(): string {
@@ -47,6 +49,8 @@ class tenant_admin_added extends \core\event\base {
     }
 
     /**
+     * Describe the administrative change for the Moodle audit log.
+     *
      * @return string Audit description with actor and object identifiers.
      */
     public function get_description(): string {
