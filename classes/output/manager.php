@@ -208,7 +208,8 @@ class manager {
                 fullname($record),
                 s($record->email),
                 $record->rolename ? format_string($record->rolename) : '-',
-                $record->enabled === null ? get_string("notassigned", "local_ai_bridge") : ($record->enabled ? get_string('yes') : get_string('no')),
+                $record->enabled === null ? get_string("notassigned", "local_ai_bridge") :
+                    ($record->enabled ? get_string("yes") : get_string("no")),
                 format_float((float)($record->creditused ?? 0), 4),
                 html_writer::link($edit, $record->enabled === null ?
                     get_string("grantaccess", "local_ai_bridge") : get_string("edit")),

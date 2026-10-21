@@ -36,12 +36,11 @@ $string['organization'] = 'Organization ID';
 $string['outputcost'] = 'Output cost per 1M tokens';
 $string['pluginname'] = 'OpenAI bridge';
 $string['privacy:metadata'] = 'The OpenAI bridge stores no personal data of its own. Configuration and usage metadata are stored by local_ai_bridge.';
+$string["privacy:metadata:external"] = "The configured OpenAI or OpenAI-compatible endpoint receives conversation messages, system instructions and optionally audio recordings for transcription.";
+$string["privacy:metadata:external:audio"] = "The audio recording is transmitted to the provider for transcription.";
+$string["privacy:metadata:external:language"] = "An optional language hint is transmitted with the transcription request.";
+$string["privacy:metadata:external:messages"] = "User and assistant message text is transmitted for generation.";
+$string["privacy:metadata:external:systeminstruction"] = "System instructions, which may contain personal information, are transmitted for generation.";
 $string['project'] = 'Project ID';
 $string['responses'] = 'Responses API';
 $string['timeout'] = 'Timeout (seconds)';
-
-$string["privacy:metadata:external"] = "The configured OpenAI or OpenAI-compatible endpoint receives conversation messages, system instructions and optionally audio recordings for transcription.";
-$string["privacy:metadata:external:messages"] = "User and assistant message text is transmitted for generation.";
-$string["privacy:metadata:external:systeminstruction"] = "System instructions, which may contain personal information, are transmitted for generation.";
-$string["privacy:metadata:external:audio"] = "The audio recording is transmitted to the provider for transcription.";
-$string["privacy:metadata:external:language"] = "An optional language hint is transmitted with the transcription request.";

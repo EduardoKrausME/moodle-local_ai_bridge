@@ -33,6 +33,8 @@ use core_privacy\local\metadata\types\external_location;
  */
 final class privacy_provider_test extends advanced_testcase {
     /**
+     * Verify the Privacy API declarations of each bundled bridge.
+     *
      * @coversNothing
      */
     public function test_bridge_providers_declare_external_locations(): void {

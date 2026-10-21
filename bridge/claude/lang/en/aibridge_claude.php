@@ -43,9 +43,8 @@ $string['inputcost'] = 'Regular input cost per 1M tokens';
 $string['outputcost'] = 'Output cost per 1M tokens';
 $string['pluginname'] = 'Claude bridge';
 $string['privacy:metadata'] = 'The Claude bridge stores no personal data of its own. Configuration and usage metadata are stored by local_ai_bridge.';
-$string['timeout'] = 'Timeout (seconds)';
-$string['websearchcost'] = 'Web search cost per 1,000 searches';
-
 $string["privacy:metadata:external"] = "The configured Anthropic Claude or compatible endpoint receives conversation messages and system instructions.";
 $string["privacy:metadata:external:messages"] = "User and assistant message text is transmitted for generation.";
 $string["privacy:metadata:external:systeminstruction"] = "System instructions, which may contain personal information, are transmitted for generation.";
+$string['timeout'] = 'Timeout (seconds)';
+$string['websearchcost'] = 'Web search cost per 1,000 searches';

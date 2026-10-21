@@ -33,8 +33,7 @@ $string['inputcost'] = 'Input cost per 1M tokens';
 $string['outputcost'] = 'Output cost per 1M tokens';
 $string['pluginname'] = 'Gemini bridge';
 $string['privacy:metadata'] = 'The Gemini bridge stores no personal data of its own. Configuration and usage metadata are stored by local_ai_bridge.';
-$string['timeout'] = 'Timeout (seconds)';
-
 $string["privacy:metadata:external"] = "The configured Google Gemini or compatible endpoint receives conversation messages and system instructions.";
 $string["privacy:metadata:external:messages"] = "User and assistant message text is transmitted for generation.";
 $string["privacy:metadata:external:systeminstruction"] = "System instructions, which may contain personal information, are transmitted for generation.";
+$string['timeout'] = 'Timeout (seconds)';
