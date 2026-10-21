@@ -149,7 +149,7 @@ $string["setting:disableai"] = "Disable all AI calls";
 $string["setting:disableai_desc"] = "Emergency switch: reject all new generation and transcription requests.";
 $string["error:aicallsdisabled"] = "AI requests have been disabled by the site administrator.";
 
-$string["confirmremoveadmin"] = "Remove {$a} from the tenant administrators?";
+$string["confirmremoveadmin"] = "Remove {\$a} from the tenant administrators?";
 $string["event:connectionchanged"] = "AI provider connection changed";
 $string["event:creditadjusted"] = "Tenant credits adjusted";
 $string["event:tenantadminadded"] = "Tenant administrator added";
