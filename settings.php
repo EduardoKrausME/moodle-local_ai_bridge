@@ -46,6 +46,18 @@ if ($hassiteconfig) {
         0
     ));
     $settings->add(new admin_setting_configcheckbox(
+        "local_ai_bridge/allowcustomhosts",
+        get_string("setting:allowcustomhosts", "local_ai_bridge"),
+        get_string("setting:allowcustomhosts_desc", "local_ai_bridge"),
+        0
+    ));
+    $settings->add(new admin_setting_configcheckbox(
+        "local_ai_bridge/allowprivatehosts",
+        get_string("setting:allowprivatehosts", "local_ai_bridge"),
+        get_string("setting:allowprivatehosts_desc", "local_ai_bridge"),
+        0
+    ));
+    $settings->add(new admin_setting_configcheckbox(
         'local_ai_bridge/logfailures',
         get_string('setting:logfailures', 'local_ai_bridge'),
         get_string('setting:logfailures_desc', 'local_ai_bridge'),

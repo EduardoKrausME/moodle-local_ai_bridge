@@ -139,3 +139,8 @@ $string['usercreditlimit'] = 'Individual credit limit';
 $string['usercreditlimit_help'] = 'Leave empty to use only the shared tenant balance. The counter is cumulative for this tenant user record.';
 $string["usershint"] = "Users listed by profile are only candidates. An administrator must explicitly grant access; profile changes do not create membership. Users with multiple enabled tenant assignments cannot use the API until the ambiguity is resolved.";
 $string['userstats'] = 'Per-user statistics';
+
+$string["setting:allowcustomhosts"] = "Allow custom provider hosts";
+$string["setting:allowcustomhosts_desc"] = "Allow hosted provider connections to use custom hosts. Only site administrators can change this setting.";
+$string["setting:allowprivatehosts"] = "Allow private provider destinations";
+$string["setting:allowprivatehosts_desc"] = "Permit connections to loopback, private and link-local network addresses (including local Ollama). Enable only with trusted tenant administrators and network egress controls.";

@@ -118,7 +118,7 @@ class bridge implements provider_interface {
         if (empty($config['apikey'])) {
             $errors['apikey'] = get_string('required');
         }
-        if ($error = url_guard::validate((string)($config['baseurl'] ?? ''))) {
+        if ($error = url_guard::validate((string)($config['baseurl'] ?? ''), "gemini")) {
             $errors['baseurl'] = $error;
         }
         return $errors;
@@ -134,10 +134,10 @@ class bridge implements provider_interface {
      */
     public function generate(request $request, array $config, string $model): response {
         $baseurl = rtrim((string)$config['baseurl'], '/');
-        if ($error = url_guard::validate($baseurl)) {
+        if ($error = url_guard::validate($baseurl, "gemini")) {
             throw new moodle_exception('error:invalidendpoint', 'local_ai_bridge');
         }
-        $url = $baseurl . '/models/' . rawurlencode($model) . ':generateContent?key=' . rawurlencode((string)$config['apikey']);
+        $url = $baseurl . '/models/' . rawurlencode($model) . ':generateContent';
         $contents = [];
         $system = [];
         foreach ($request->messages as $message) {
@@ -168,17 +168,17 @@ class bridge implements provider_interface {
         if ($generation) {
             $payload['generationConfig'] = $generation;
         }
-        $payload = array_replace_recursive($payload, $request->options);
+        $payload = array_replace_recursive($payload, \\local_ai_bridge\\security\\request_options::filter("gemini", $request->options));
         $curl = new curl();
-        $curl->setHeader(['Content-Type: application/json']);
+        $curl->setHeader(['Content-Type: application/json', 'x-goog-api-key: ' . $config['apikey']]);
         $raw = $curl->post($url, json_encode($payload, JSON_THROW_ON_ERROR),
-            ['CURLOPT_TIMEOUT' => max(1, (int)($config['timeout'] ?? 60))]);
+            ['CURLOPT_FOLLOWLOCATION' => false, 'CURLOPT_TIMEOUT' => max(1, (int)($config['timeout'] ?? 60))]);
         $info = $curl->get_info();
         $status = (int)($info['http_code'] ?? 0);
         $data = json_decode((string)$raw, true);
         if ($status < 200 || $status >= 300) {
             $message = is_array($data) ? (string)($data['error']['message'] ?? 'HTTP ' . $status) : 'HTTP ' . $status;
-            throw new moodle_exception('error:request', 'aibridge_gemini', '', $message);
+            throw new moodle_exception('error:request', 'aibridge_gemini', '', \\local_ai_bridge\\security\\provider_error::safe($message));
         }
         if (!is_array($data)) {
             throw new moodle_exception('error:response', 'aibridge_gemini');

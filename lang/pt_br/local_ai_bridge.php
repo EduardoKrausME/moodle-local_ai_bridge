@@ -139,3 +139,8 @@ $string['usercreditlimit'] = 'Limite individual de créditos';
 $string['usercreditlimit_help'] = 'Deixe em branco para usar apenas o saldo compartilhado do tenant. O contador é cumulativo para este registro de usuário no tenant.';
 $string["usershint"] = "Usuários listados pelo perfil são apenas candidatos. Um administrador deve conceder acesso explicitamente; mudanças no perfil não criam vínculos. Usuários vinculados a vários tenants ativos não podem usar a API até resolver a ambiguidade.";
 $string['userstats'] = 'Estatísticas por usuário';
+
+$string["setting:allowcustomhosts"] = "Permitir hosts personalizados de provedores";
+$string["setting:allowcustomhosts_desc"] = "Permite conexões de provedores hospedados a servidores personalizados. Apenas administradores do site podem alterar esta configuração.";
+$string["setting:allowprivatehosts"] = "Permitir destinos de rede privada";
+$string["setting:allowprivatehosts_desc"] = "Permite conexões a endereços de loopback, privados e link-local (inclusive Ollama local). Ative apenas com administradores confiáveis e controles de saída de rede.";

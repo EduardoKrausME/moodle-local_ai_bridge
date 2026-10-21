@@ -51,6 +51,12 @@ class api {
         global $DB, $USER;
         $userid ??= (int)$USER->id;
         $context = context_system::instance();
+        if ($userid !== (int)$USER->id && !has_capability("local/ai_bridge:manageall", $context, (int)$USER->id)) {
+            throw new required_capability_exception($context, "local/ai_bridge:manageall", "nopermissions", "");
+        }
+        if ($userid !== (int)$USER->id && !has_capability("local/ai_bridge:manageall", $context, (int)$USER->id)) {
+            throw new required_capability_exception($context, "local/ai_bridge:manageall", "nopermissions", "");
+        }
         if (!has_capability('local/ai_bridge:use', $context, $userid)) {
             throw new required_capability_exception($context, 'local/ai_bridge:use', 'nopermissions', '');
         }
@@ -224,7 +230,7 @@ class api {
                 throw new invalid_parameter_exception('Each AI message requires role and content.');
             }
             $role = (string)$message['role'];
-            if (!in_array($role, ['system', 'user', 'assistant'], true)) {
+            if (!in_array($role, ["user", "assistant"], true)) {
                 throw new invalid_parameter_exception('Unsupported AI message role.');
             }
             $normalized[] = ['role' => $role, 'content' => (string)$message['content']];

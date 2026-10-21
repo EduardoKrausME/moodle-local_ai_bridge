@@ -158,7 +158,7 @@ class bridge implements provider_interface {
             $errors['apikey'] = get_string('error:invalidheader', 'aibridge_claude');
         }
 
-        if ($error = url_guard::validate((string)($config['baseurl'] ?? ''))) {
+        if ($error = url_guard::validate((string)($config['baseurl'] ?? ''), "claude")) {
             $errors['baseurl'] = $error;
         }
 
@@ -198,7 +198,7 @@ class bridge implements provider_interface {
      */
     public function generate(request $request, array $config, string $model): response {
         $baseurl = rtrim((string)($config['baseurl'] ?? ''), '/');
-        if ($error = url_guard::validate($baseurl)) {
+        if ($error = url_guard::validate($baseurl, "claude")) {
             throw new moodle_exception('error:invalidendpoint', 'local_ai_bridge');
         }
 
@@ -210,7 +210,7 @@ class bridge implements provider_interface {
         $raw = $curl->post(
             $baseurl . '/messages',
             json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
-            ['CURLOPT_TIMEOUT' => max(1, (int)($config['timeout'] ?? 60))]
+            ['CURLOPT_FOLLOWLOCATION' => false, 'CURLOPT_TIMEOUT' => max(1, (int)($config['timeout'] ?? 60))]
         );
 
         $info = $curl->get_info();
@@ -220,9 +220,9 @@ class bridge implements provider_interface {
         if ($status < 200 || $status >= 300) {
             $message = 'HTTP ' . $status;
             if (is_array($data)) {
-                $message = (string)($data['error']['message'] ?? $data['message'] ?? $message);
+                $message = (string)($data['error']['message'] ?? $data['message'] ?? \\local_ai_bridge\\security\\provider_error::safe($message));
             }
-            throw new moodle_exception('error:request', 'aibridge_claude', '', $message);
+            throw new moodle_exception('error:request', 'aibridge_claude', '', \\local_ai_bridge\\security\\provider_error::safe($message));
         }
 
         if (!is_array($data) || !isset($data['content']) || !is_array($data['content'])) {
@@ -316,7 +316,7 @@ class bridge implements provider_interface {
         // Temperature is intentionally not copied automatically. Anthropic has deprecated
         // it for newer Claude models. Advanced callers can still add it explicitly through
         // request options when targeting a model that supports it.
-        return $payload + $request->options;
+        return $payload + \\local_ai_bridge\\security\\request_options::filter("claude", $request->options);
     }
 
     /**

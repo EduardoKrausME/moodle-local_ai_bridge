@@ -63,10 +63,13 @@ Provider configuration is encrypted with Moodle `core\encryption` before it is s
 not persisted in usage logs. Pending asynchronous requests temporarily store an encrypted prompt payload in Moodle's
 ad hoc task queue until the task is processed.
 
-Provider endpoints can use any HTTP or HTTPS host, including self-hosted services such as Ollama. The plugin
-validates the URL scheme but no longer maintains a site-wide host allowlist. Because delegated tenant administrators
-can configure provider connections, grant this privilege only to trusted users and enforce appropriate outbound network
-restrictions at the server/firewall level to mitigate SSRF.
+Hosted provider endpoints default to their official HTTPS hostnames. Only site administrators can enable the
+`allowcustomhosts` setting to permit custom API gateways. Private, loopback, link-local and local hostnames are
+blocked until a site administrator explicitly enables `allowprivatehosts`; this includes local Ollama
+(`http://localhost:11434`). HTTP is allowed only for Ollama. HTTP redirects are disabled for provider requests.
+Use firewall egress restrictions as defense in depth. Consumer-supplied system messages are rejected;
+the purpose's administrator-defined system instruction cannot be overwritten through raw request options.
+Acting on behalf of another Moodle user requires the site's `manageall` capability.
 
 ## Calling AI Bridge from another plugin
 

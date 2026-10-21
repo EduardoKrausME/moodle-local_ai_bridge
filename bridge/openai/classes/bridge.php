@@ -123,7 +123,7 @@ class bridge implements provider_interface, transcription_provider_interface {
         if (empty($config['apikey'])) {
             $errors['apikey'] = get_string('required');
         }
-        if ($error = url_guard::validate((string)($config['baseurl'] ?? ''))) {
+        if ($error = url_guard::validate((string)($config['baseurl'] ?? ''), "openai")) {
             $errors['baseurl'] = $error;
         }
         if (!in_array($config['apimode'] ?? '', ['responses', 'chatcompletions'], true)) {
@@ -142,7 +142,7 @@ class bridge implements provider_interface, transcription_provider_interface {
      */
     public function generate(request $request, array $config, string $model): response {
         $baseurl = rtrim((string)$config['baseurl'], '/');
-        if ($error = url_guard::validate($baseurl)) {
+        if ($error = url_guard::validate($baseurl, "openai")) {
             throw new moodle_exception('error:invalidendpoint', 'local_ai_bridge');
         }
         $mode = $config['apimode'] ?? 'responses';
@@ -157,14 +157,14 @@ class bridge implements provider_interface, transcription_provider_interface {
         $payload = $mode === 'chatcompletions' ? $this->chat_payload($request, $model) : $this->responses_payload($request, $model);
         $curl = new curl();
         $curl->setHeader($headers);
-        $options = ['CURLOPT_TIMEOUT' => max(1, (int)($config['timeout'] ?? 60))];
+        $options = ['CURLOPT_FOLLOWLOCATION' => false, 'CURLOPT_TIMEOUT' => max(1, (int)($config['timeout'] ?? 60))];
         $raw = $curl->post($url, json_encode($payload, JSON_THROW_ON_ERROR), $options);
         $info = $curl->get_info();
         $status = (int)($info['http_code'] ?? 0);
         $data = json_decode((string)$raw, true);
         if ($status < 200 || $status >= 300) {
             $message = is_array($data) ? (string)($data['error']['message'] ?? 'HTTP ' . $status) : 'HTTP ' . $status;
-            throw new moodle_exception('error:request', 'aibridge_openai', '', $message);
+            throw new moodle_exception('error:request', 'aibridge_openai', '', \\local_ai_bridge\\security\\provider_error::safe($message));
         }
         if (!is_array($data)) {
             throw new moodle_exception('error:response', 'aibridge_openai');
@@ -201,7 +201,7 @@ class bridge implements provider_interface, transcription_provider_interface {
     public function transcribe(\stored_file $audio, array $config, string $model,
             array $options = []): response {
         $baseurl = rtrim((string)($config['baseurl'] ?? ''), '/');
-        if ($error = url_guard::validate($baseurl)) {
+        if ($error = url_guard::validate($baseurl, "openai")) {
             throw new moodle_exception('error:invalidendpoint', 'local_ai_bridge');
         }
         if ($audio->get_filesize() <= 0 || $audio->get_filesize() > 25 * 1024 * 1024) {
@@ -239,7 +239,7 @@ class bridge implements provider_interface, transcription_provider_interface {
             $curl = new curl();
             $curl->setHeader($headers);
             $raw = $curl->post($baseurl . '/audio/transcriptions', $params,
-                ['CURLOPT_TIMEOUT' => max(1, (int)($config['timeout'] ?? 60))]);
+                ['CURLOPT_FOLLOWLOCATION' => false, 'CURLOPT_TIMEOUT' => max(1, (int)($config['timeout'] ?? 60))]);
             $status = (int)($curl->get_info()['http_code'] ?? 0);
             if ($status < 200 || $status >= 300) {
                 throw new moodle_exception('error:request', 'aibridge_openai', '', 'HTTP ' . $status);
@@ -273,7 +273,7 @@ class bridge implements provider_interface, transcription_provider_interface {
         if ($request->maxoutputtokens !== null) {
             $payload['max_completion_tokens'] = $request->maxoutputtokens;
         }
-        return $payload + $request->options;
+        return $payload + \\local_ai_bridge\\security\\request_options::filter("openai", $request->options);
     }
 
     /**
@@ -291,7 +291,7 @@ class bridge implements provider_interface, transcription_provider_interface {
         if ($request->maxoutputtokens !== null) {
             $payload['max_output_tokens'] = $request->maxoutputtokens;
         }
-        return $payload + $request->options;
+        return $payload + \\local_ai_bridge\\security\\request_options::filter("openai", $request->options);
     }
 
     /**
