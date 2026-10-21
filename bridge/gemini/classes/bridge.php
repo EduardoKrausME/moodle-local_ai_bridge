@@ -168,7 +168,8 @@ class bridge implements provider_interface {
         if ($generation) {
             $payload['generationConfig'] = $generation;
         }
-        $payload = array_replace_recursive($payload, \local_ai_bridge\security\request_options::filter("gemini", $request->options));
+        $payload = array_replace_recursive($payload,
+            \local_ai_bridge\security\request_options::filter("gemini", $request->options));
         $curl = new curl();
         $curl->setHeader(['Content-Type: application/json', 'x-goog-api-key: ' . $config['apikey']]);
         $raw = $curl->post($url, json_encode($payload, JSON_THROW_ON_ERROR),
@@ -178,7 +179,8 @@ class bridge implements provider_interface {
         $data = json_decode((string)$raw, true);
         if ($status < 200 || $status >= 300) {
             $message = is_array($data) ? (string)($data['error']['message'] ?? 'HTTP ' . $status) : 'HTTP ' . $status;
-            throw new moodle_exception('error:request', 'aibridge_gemini', '', \local_ai_bridge\security\provider_error::safe($message));
+            throw new moodle_exception("error:request", "aibridge_gemini", "",
+                \local_ai_bridge\security\provider_error::safe($message));
         }
         if (!is_array($data)) {
             throw new moodle_exception('error:response', 'aibridge_gemini');
