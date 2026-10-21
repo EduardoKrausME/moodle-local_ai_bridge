@@ -24,10 +24,6 @@
 
 namespace local_ai_bridge\event;
 
-use core\lock\lock_config;
-use moodle_exception;
-use stdClass;
-
 /**
  * Audit tenant credit balance changes without logging credentials or prompts.
  */
