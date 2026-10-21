@@ -31,6 +31,31 @@ use stdClass;
  */
 class user_service {
     /**
+     * Verify that a tenant administrator may load a user's personal data.
+     * Existing explicit assignments remain valid even after profile changes.
+     *
+     * @param stdClass $tenant Tenant configuration.
+     * @param int $userid User being managed.
+     * @return bool Whether the user belongs to this tenant or meets its candidate filter.
+     */
+    public static function is_eligible_for_tenant(stdClass $tenant, int $userid): bool {
+        global $DB;
+        $criteria = ["id" => $userid, "deleted" => 0];
+        if ($DB->record_exists("local_ai_bridge_user",
+                ["tenantid" => (int)$tenant->id, "userid" => $userid])) {
+            return $DB->record_exists("user", $criteria);
+        }
+        $mode = get_config("local_ai_bridge", "tenantkey") ?: "institution_department";
+        $profile = tenant_service::profile_conditions(
+            $mode, (string)$tenant->institution, (string)$tenant->department
+        );
+        if ($profile === null) {
+            return false;
+        }
+        return $DB->record_exists("user", $criteria + $profile);
+    }
+
+    /**
      * Method get_or_create.
      *
      * @param int $tenantid Parameter tenantid.

@@ -25,7 +25,6 @@
 use local_ai_bridge\access;
 use local_ai_bridge\form\user_form;
 use local_ai_bridge\user_service;
-use local_ai_bridge\tenant_service;
 
 require_once(__DIR__ . '/../../config.php');
 require_once("{$CFG->libdir}/formslib.php");
@@ -34,23 +33,14 @@ $tenantid = required_param('tenantid', PARAM_INT);
 $userid = required_param('userid', PARAM_INT);
 access::require_manage_tenant($tenantid);
 $tenant = $DB->get_record('local_ai_bridge_tenant', ['id' => $tenantid], '*', MUST_EXIST);
-$user = $DB->get_record('user', ['id' => $userid, 'deleted' => 0], '*', MUST_EXIST);
+// Do not fetch user names or email before proving this administrator may manage them.
+if (!user_service::is_eligible_for_tenant($tenant, $userid)) {
+    throw new moodle_exception("error:usernoteligible", "local_ai_bridge");
+}
+$user = $DB->get_record("user", ["id" => $userid, "deleted" => 0], "*", MUST_EXIST);
 // Opening the form must never silently grant tenant access.
 $control = $DB->get_record("local_ai_bridge_user", ["tenantid" => $tenantid, "userid" => $userid]);
 if (!$control) {
-    // Matching profile fields supply candidates, but never authorize membership.
-    $mode = get_config("local_ai_bridge", "tenantkey") ?: "institution_department";
-    $conditions = tenant_service::profile_conditions(
-        $mode, (string)$tenant->institution, (string)$tenant->department
-    );
-    if ($conditions === null) {
-        throw new moodle_exception("error:usernoteligible", "local_ai_bridge");
-    }
-    foreach ($conditions as $field => $value) {
-        if ((string)$user->{$field} !== (string)$value) {
-            throw new moodle_exception("error:usernoteligible", "local_ai_bridge");
-        }
-    }
     $defaultrole = $DB->get_record("local_ai_bridge_role",
         ["tenantid" => $tenantid, "isdefault" => 1, "enabled" => 1]);
     $control = (object)[

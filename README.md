@@ -27,7 +27,8 @@ Moodle profile fields `institution` and `department` may filter administrative c
 but self-editing these fields cannot grant access to another tenant's credentials or credits.
 
 The authorized tenant administrator must save a candidate's user form to grant membership. Opening the form
-does not create a record. Previously existing user control records remain valid regardless of profile edits.
+does not create a record. User names and email addresses are loaded only after checking the tenant-specific
+assignment or candidate conditions. Previously existing user control records remain valid regardless of profile edits.
 Because no tenant-selection argument exists, users assigned to more than one enabled tenant are denied API access
 until administrators resolve the ambiguity. On upgrade, users formerly relying only on implicit profile
 matching **must receive explicit assignments** before using generation or transcription.
@@ -126,9 +127,14 @@ Callback exceptions are logged without retrying an already-billed generation.
 
 Omit the callback (or pass `null`) to keep the existing synchronous behavior, returning a `response` directly.
 
-The API resolves the current user tenant, checks tenant/user state and credits, resolves purpose and logical role, tries
-configured routes, delegates the request to the selected `aibridge_*` provider, records usage metadata and debits
-credits only after success.
+The API resolves the current user's tenant, checks tenant/user state and quota, reserves credits, and delegates
+generation or transcription to the configured provider. Consumers must verify their own Moodle context capabilities
+before using this API. Passing another user ID is reserved for site-wide `local/ai_bridge:manageall` administrators,
+and consumer `system` messages are rejected; place instructions in the configured purpose instead. Extra
+provider parameters are restricted to harmless tuning fields: OpenAI (`top_p`, `presence_penalty`,
+`frequency_penalty`), Claude (`top_p`, `top_k`), Gemini (`generationConfig.topP`, `topK`)
+and Ollama (`options.top_k`, `top_p`, `seed`, `repeat_penalty`). Other raw payload fields
+are ignored, preventing consumers from overriding provider model, message body, quota or purpose token limits.
 
 ## Audio transcription
 
