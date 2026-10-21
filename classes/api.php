@@ -125,9 +125,13 @@ class api {
             // propagate the accounting error instead of issuing a duplicate paid request.
             $latency = (int)round((hrtime(true) - $started) / 1_000_000);
             $transaction = $DB->start_delegated_transaction();
-            $usageid = usage_logger::success($tenant, $userid, $purpose, $usercontrol, $route, $response, $latency);
-            credit_manager::record_reserved_usage((int)$tenant->id, $userid, $usageid, $credits);
-            $transaction->allow_commit();
+            try {
+                $usageid = usage_logger::success($tenant, $userid, $purpose, $usercontrol, $route, $response, $latency);
+                credit_manager::record_reserved_usage((int)$tenant->id, $userid, $usageid, $credits);
+                $transaction->allow_commit();
+            } catch (Throwable $exception) {
+                $transaction->rollback($exception);
+            }
             $settled = true;
             return $response;
         }
@@ -221,9 +225,13 @@ class api {
             // Never retry a paid provider call because usage accounting fails.
             $latency = (int)round((hrtime(true) - $started) / 1_000_000);
             $transaction = $DB->start_delegated_transaction();
-            $usageid = usage_logger::success($tenant, $userid, $purpose, $usercontrol, $route, $response, $latency);
-            credit_manager::record_reserved_usage((int)$tenant->id, $userid, $usageid, $credits);
-            $transaction->allow_commit();
+            try {
+                $usageid = usage_logger::success($tenant, $userid, $purpose, $usercontrol, $route, $response, $latency);
+                credit_manager::record_reserved_usage((int)$tenant->id, $userid, $usageid, $credits);
+                $transaction->allow_commit();
+            } catch (Throwable $exception) {
+                $transaction->rollback($exception);
+            }
             $settled = true;
             return $response;
         }
