@@ -22,8 +22,15 @@ subplugins are discoverable across the supported Moodle versions and by the vali
 
 ## Tenant isolation
 
-Tenants are matched using the standard Moodle user profile fields `institution`, `department`, or the combination of
-both. Automatic tenant creation can be enabled, but is disabled by default.
+Tenant authorization requires an **explicit user-to-tenant assignment** in `local_ai_bridge_user`. Standard
+Moodle profile fields `institution` and `department` may filter administrative candidates or name tenant records,
+but self-editing these fields cannot grant access to another tenant's credentials or credits.
+
+The authorized tenant administrator must save a candidate's user form to grant membership. Opening the form
+does not create a record. Previously existing user control records remain valid regardless of profile edits.
+Because no tenant-selection argument exists, users assigned to more than one enabled tenant are denied API access
+until administrators resolve the ambiguity. On upgrade, users formerly relying only on implicit profile
+matching **must receive explicit assignments** before using generation or transcription.
 
 A delegated tenant administrator can manage only assigned tenants. Site administrators/managers
 with `local/ai_bridge:manageall` can manage every tenant.
@@ -146,7 +153,7 @@ pricing is not estimated in the bridge; internal configured purpose credits stil
 
 Usage statistics store user ID, provider, model, token counts, credits, estimated cost, latency and status. The plugin
 deliberately does not store prompt text or generated text. A Moodle Privacy API provider implements metadata, export,
-deletion and user-list deletion.
+deletion and user-list deletion. Provider subplugins individually declare exported messages and system instructions; OpenAI also declares audio recordings and optional language hints. Destinations are configurable, including self-hosted endpoints, and administrators must review the relevant provider data-processing terms.
 
 ## Compatibility
 

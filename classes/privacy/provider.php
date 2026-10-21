@@ -49,6 +49,8 @@ class provider implements
      * @return collection Return value.
      */
     public static function get_metadata(collection $collection): collection {
+        // Each bridge describes its own external exports in its Privacy API provider.
+        $collection->add_plugintype_link("aibridge", [], "privacy:metadata:providers");
         $collection->add_database_table('local_ai_bridge_user', [
             'userid' => 'privacy:metadata:user:userid',
             'roleid' => 'privacy:metadata:user:roleid',

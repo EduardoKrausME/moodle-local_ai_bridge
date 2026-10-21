@@ -32,3 +32,7 @@ $string['error:response'] = 'Ollama returned an invalid response.';
 $string['pluginname'] = 'Ollama bridge';
 $string['privacy:metadata'] = 'The Ollama bridge stores no personal data of its own. Configuration and usage metadata are stored by local_ai_bridge.';
 $string['timeout'] = 'Timeout (seconds)';
+
+$string["privacy:metadata:external"] = "The configured self-hosted Ollama endpoint receives conversation messages and system instructions.";
+$string["privacy:metadata:external:messages"] = "User and assistant message text is transmitted for generation.";
+$string["privacy:metadata:external:systeminstruction"] = "System instructions, which may contain personal information, are transmitted for generation.";

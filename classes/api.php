@@ -61,7 +61,13 @@ class api {
         if (!$tenant || !$tenant->enabled) {
             throw new moodle_exception('error:notenant', 'local_ai_bridge');
         }
-        $usercontrol = user_service::get_or_create((int)$tenant->id, $userid);
+        // Ordinary API requests may not provision tenant membership.
+        $usercontrol = $DB->get_record("local_ai_bridge_user", [
+            "tenantid" => (int)$tenant->id, "userid" => $userid,
+        ]);
+        if (!$usercontrol) {
+            throw new moodle_exception("error:notenant", "local_ai_bridge");
+        }
         if (!$usercontrol->enabled) {
             throw new moodle_exception('error:userdisabled', 'local_ai_bridge');
         }
@@ -143,7 +149,13 @@ class api {
         if (!$tenant || !$tenant->enabled) {
             throw new moodle_exception('error:notenant', 'local_ai_bridge');
         }
-        $usercontrol = user_service::get_or_create((int)$tenant->id, $userid);
+        // Ordinary API requests may not provision tenant membership.
+        $usercontrol = $DB->get_record("local_ai_bridge_user", [
+            "tenantid" => (int)$tenant->id, "userid" => $userid,
+        ]);
+        if (!$usercontrol) {
+            throw new moodle_exception("error:notenant", "local_ai_bridge");
+        }
         if (!$usercontrol->enabled) {
             throw new moodle_exception('error:userdisabled', 'local_ai_bridge');
         }

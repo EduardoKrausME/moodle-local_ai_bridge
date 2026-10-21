@@ -24,18 +24,26 @@
 
 namespace aibridge_openai\privacy;
 
-use core_privacy\local\metadata\null_provider;
+use core_privacy\local\metadata\collection;
+use core_privacy\local\metadata\provider as metadata_provider;
 
 /**
  * Class provider.
  */
-class provider implements null_provider {
+class provider implements metadata_provider {
     /**
-     * Method get_reason.
+     * Describe the personal data sent to this external AI destination.
      *
-     * @return string Return value.
+     * @param collection $collection Metadata collection.
+     * @return collection Updated metadata collection.
      */
-    public static function get_reason(): string {
-        return 'privacy:metadata';
+    public static function get_metadata(collection $collection): collection {
+        $collection->add_external_location_link("openai", [
+            "messages" => "privacy:metadata:external:messages",
+            "systeminstruction" => "privacy:metadata:external:systeminstruction",
+            "audio" => "privacy:metadata:external:audio",
+            "language" => "privacy:metadata:external:language",
+        ], "privacy:metadata:external");
+        return $collection;
     }
 }

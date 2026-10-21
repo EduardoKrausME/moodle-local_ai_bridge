@@ -38,17 +38,19 @@ class tenant_resolver {
      */
     public static function resolve_user(int $userid): ?stdClass {
         global $DB;
-        $user = $DB->get_record('user', ['id' => $userid, 'deleted' => 0], 'id,institution,department', MUST_EXIST);
-        $mode = get_config('local_ai_bridge', 'tenantkey') ?: 'institution_department';
-        $conditions = tenant_service::profile_conditions($mode, (string)$user->institution, (string)$user->department);
-        if ($conditions === null) {
+
+        // Only an existing administrative assignment authorizes tenant access.
+        if (!$DB->record_exists("user", ["id" => $userid, "deleted" => 0, "suspended" => 0])) {
             return null;
         }
-        $conditions['enabled'] = 1;
-        $matches = $DB->get_records('local_ai_bridge_tenant', $conditions, 'id ASC', '*', 0, 1);
-        if ($matches) {
-            return reset($matches);
-        }
-        return tenant_service::ensure_from_profile((string)$user->institution, (string)$user->department);
+        $sql = "SELECT t.*
+                  FROM {local_ai_bridge_tenant} t
+                  JOIN {local_ai_bridge_user} u ON u.tenantid = t.id
+                 WHERE u.userid = :userid AND t.enabled = 1
+              ORDER BY t.id ASC";
+        $matches = $DB->get_records_sql($sql, ["userid" => $userid], 0, 2);
+
+        // Without a tenant selector, multiple memberships are ambiguous and must fail closed.
+        return count($matches) === 1 ? reset($matches) : null;
     }
 }

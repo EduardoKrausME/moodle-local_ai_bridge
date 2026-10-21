@@ -190,7 +190,7 @@ class manager {
                   FROM {user} u
              LEFT JOIN {local_ai_bridge_user} ctl ON ctl.userid = u.id AND ctl.tenantid = :tenantid
              LEFT JOIN {local_ai_bridge_role} ar ON ar.id = ctl.roleid
-                 WHERE u.deleted = 0 AND u.id > 1{$profilewhere}
+                 WHERE u.deleted = 0 AND u.id > 1 AND (ctl.id IS NOT NULL OR (1 = 1{$profilewhere}))
               ORDER BY u.lastname, u.firstname";
         $records = $DB->get_records_sql($sql, $params, 0, 200);
         $table = new html_table();
@@ -208,9 +208,10 @@ class manager {
                 fullname($record),
                 s($record->email),
                 $record->rolename ? format_string($record->rolename) : '-',
-                $record->enabled === null ? get_string('default') : ($record->enabled ? get_string('yes') : get_string('no')),
+                $record->enabled === null ? get_string("notassigned", "local_ai_bridge") : ($record->enabled ? get_string('yes') : get_string('no')),
                 format_float((float)($record->creditused ?? 0), 4),
-                html_writer::link($edit, get_string('edit')),
+                html_writer::link($edit, $record->enabled === null ?
+                    get_string("grantaccess", "local_ai_bridge") : get_string("edit")),
             ];
         }
         return html_writer::table($table) . html_writer::tag('p', get_string('usershint', 'local_ai_bridge'),
