@@ -113,6 +113,11 @@ class credit_manager {
             $user->timemodified = time();
             $DB->update_record("local_ai_bridge_user", $user);
             $transaction->allow_commit();
+        } catch (\Throwable $exception) {
+            if (isset($transaction)) {
+                $transaction->rollback($exception);
+            }
+            throw $exception;
         } finally {
             $lock->release();
         }
