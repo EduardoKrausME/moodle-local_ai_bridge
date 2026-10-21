@@ -24,15 +24,17 @@
 
 namespace local_ai_bridge;
 
-use stdClass;
-
 use advanced_testcase;
 
 /**
  * Tenant user eligibility checks run before any personal data is loaded.
  */
 final class user_service_test extends advanced_testcase {
-    /** @covers \local_ai_bridge\user_service::is_eligible_for_tenant */
+    /**
+     * Verify expected behavior.
+     *
+     * @covers \local_ai_bridge\user_service::is_eligible_for_tenant
+     */
     public function test_other_tenant_is_not_eligible(): void {
         $this->resetAfterTest();
         set_config("tenantkey", "institution_department", "local_ai_bridge");
@@ -53,7 +55,11 @@ final class user_service_test extends advanced_testcase {
         $this->assertTrue(user_service::is_eligible_for_tenant($first, (int)$user->id));
     }
 
-    /** @covers \local_ai_bridge\user_service::is_eligible_for_tenant */
+    /**
+     * Verify expected behavior.
+     *
+     * @covers \local_ai_bridge\user_service::is_eligible_for_tenant
+     */
     public function test_unmatched_profile_and_unknown_user_are_rejected(): void {
         $this->resetAfterTest();
         $tenant = tenant_service::create([

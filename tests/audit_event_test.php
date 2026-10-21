@@ -24,10 +24,6 @@
 
 namespace local_ai_bridge;
 
-use core\lock\lock_config;
-use moodle_exception;
-use stdClass;
-
 use advanced_testcase;
 use local_ai_bridge\event\credit_adjusted;
 
@@ -35,7 +31,11 @@ use local_ai_bridge\event\credit_adjusted;
  * Check that administrative credit adjustments have a native Moodle audit record.
  */
 final class audit_event_test extends advanced_testcase {
-    /** @covers \local_ai_bridge\credit_manager::adjust */
+    /**
+     * Verify expected behavior.
+     *
+     * @covers \local_ai_bridge\credit_manager::adjust
+     */
     public function test_credit_adjustment_emits_event(): void {
         $this->resetAfterTest();
         $tenant = tenant_service::create([

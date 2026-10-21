@@ -31,7 +31,11 @@ use local_ai_bridge\security\url_guard;
  * Endpoint restrictions prevent credentials being sent to arbitrary destinations.
  */
 final class url_guard_test extends advanced_testcase {
-    /** @covers \local_ai_bridge\security\url_guard::validate */
+    /**
+     * Verify expected behavior.
+     *
+     * @covers \local_ai_bridge\security\url_guard::validate
+     */
     public function test_hosted_providers_are_pinned(): void {
         $this->resetAfterTest();
         $this->assertNull(url_guard::validate("https://api.openai.com/v1", "openai"));
@@ -43,7 +47,11 @@ final class url_guard_test extends advanced_testcase {
         $this->assertNotNull(url_guard::validate("http://localhost:11434", "ollama"));
     }
 
-    /** @covers \local_ai_bridge\security\url_guard::validate */
+    /**
+     * Verify expected behavior.
+     *
+     * @covers \local_ai_bridge\security\url_guard::validate
+     */
     public function test_private_endpoints_need_site_override(): void {
         $this->resetAfterTest();
         set_config("allowprivatehosts", 1, "local_ai_bridge");
@@ -53,7 +61,11 @@ final class url_guard_test extends advanced_testcase {
         $this->assertNotNull(url_guard::validate("http://user:pass@localhost:11434", "ollama"));
     }
 
-    /** @covers \local_ai_bridge\security\url_guard::is_private_host */
+    /**
+     * Verify expected behavior.
+     *
+     * @covers \local_ai_bridge\security\url_guard::is_private_host
+     */
     public function test_special_addresses_are_private(): void {
         foreach (["localhost", "service.local", "127.0.0.1", "10.1.2.3",
                 "169.254.169.254", "192.168.1.2", "::1", "fe80::1", "::ffff:127.0.0.1"] as $host) {

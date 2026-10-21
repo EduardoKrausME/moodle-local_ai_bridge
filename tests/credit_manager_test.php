@@ -24,10 +24,6 @@
 
 namespace local_ai_bridge;
 
-use core\lock\lock_config;
-use moodle_exception;
-use stdClass;
-
 use advanced_testcase;
 use moodle_exception;
 
@@ -35,7 +31,11 @@ use moodle_exception;
  * Check quota reservation before spending on an external provider.
  */
 final class credit_manager_test extends advanced_testcase {
-    /** @covers \local_ai_bridge\credit_manager::reserve */
+    /**
+     * Verify expected behavior.
+     *
+     * @covers \local_ai_bridge\credit_manager::reserve
+     */
     public function test_quota_reservation_and_release(): void {
         global $DB;
         $this->resetAfterTest();
@@ -58,7 +58,11 @@ final class credit_manager_test extends advanced_testcase {
             "creditused", ["tenantid" => $tenant->id, "userid" => $user->id]), 0.0001);
     }
 
-    /** @covers \local_ai_bridge\credit_manager::reserve */
+    /**
+     * Verify expected behavior.
+     *
+     * @covers \local_ai_bridge\credit_manager::reserve
+     */
     public function test_disabled_member_cannot_reserve(): void {
         global $DB;
         $this->resetAfterTest();

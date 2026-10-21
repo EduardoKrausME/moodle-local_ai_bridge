@@ -29,6 +29,8 @@ namespace local_ai_bridge\security;
  */
 class provider_error {
     /**
+     * Convert an untrusted provider response into a bounded plain-text error.
+     *
      * @param mixed $message Provider error payload.
      * @return string Safe, bounded plain-text error.
      */

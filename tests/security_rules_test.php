@@ -32,7 +32,11 @@ use local_ai_bridge\security\request_options;
  * Defend the provider boundary from raw consumer payload injection.
  */
 final class security_rules_test extends advanced_testcase {
-    /** @covers \local_ai_bridge\security\request_options::filter */
+    /**
+     * Verify expected behavior.
+     *
+     * @covers \local_ai_bridge\security\request_options::filter
+     */
     public function test_options_cannot_override_mandatory_payload(): void {
         $this->assertSame(["generationConfig" => ["topK" => 7]],
             request_options::filter("gemini", [
@@ -49,7 +53,11 @@ final class security_rules_test extends advanced_testcase {
             request_options::filter("openai", ["top_p" => 0.5, "max_output_tokens" => 99999]));
     }
 
-    /** @covers \local_ai_bridge\security\provider_error::safe */
+    /**
+     * Verify expected behavior.
+     *
+     * @covers \local_ai_bridge\security\provider_error::safe
+     */
     public function test_provider_error_is_plain_text_and_bounded(): void {
         $message = "<script>alert(1)</script>" . str_repeat("x", 500);
         $safe = provider_error::safe($message);
