@@ -144,3 +144,7 @@ $string["setting:allowcustomhosts"] = "Allow custom provider hosts";
 $string["setting:allowcustomhosts_desc"] = "Allow hosted provider connections to use custom hosts. Only site administrators can change this setting.";
 $string["setting:allowprivatehosts"] = "Allow private provider destinations";
 $string["setting:allowprivatehosts_desc"] = "Permit connections to loopback, private and link-local network addresses (including local Ollama). Enable only with trusted tenant administrators and network egress controls.";
+
+$string["setting:disableai"] = "Disable all AI calls";
+$string["setting:disableai_desc"] = "Emergency switch: reject all new generation and transcription requests.";
+$string["error:aicallsdisabled"] = "AI requests have been disabled by the site administrator.";

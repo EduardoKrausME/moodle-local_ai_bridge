@@ -54,6 +54,98 @@ class credit_manager {
     }
 
     /**
+     * Reserve quota atomically before calling an external provider.
+     *
+     * @param int $tenantid Tenant.
+     * @param int $userid User.
+     * @param float $credits Cost.
+     * @return void
+     */
+    public static function reserve(int $tenantid, int $userid, float $credits): void {
+        self::update_reservation($tenantid, $userid, $credits);
+    }
+
+    /**
+     * Release quota after all providers fail, without affecting usage logs.
+     *
+     * @param int $tenantid Tenant.
+     * @param int $userid User.
+     * @param float $credits Amount.
+     * @return void
+     */
+    public static function release(int $tenantid, int $userid, float $credits): void {
+        self::update_reservation($tenantid, $userid, -$credits);
+    }
+
+    /**
+     * Serialize both reservations and releases on the same tenant lock.
+     *
+     * @param int $tenantid Tenant.
+     * @param int $userid User.
+     * @param float $credits Positive to reserve and negative to release.
+     * @return void
+     */
+    private static function update_reservation(int $tenantid, int $userid, float $credits): void {
+        global $DB;
+        if ($credits == 0) {
+            return;
+        }
+        $factory = lock_config::get_lock_factory("local_ai_bridge");
+        $lock = $factory->get_lock("credits_tenant_" . $tenantid, 10);
+        if (!$lock) {
+            throw new moodle_exception("error:creditlock", "local_ai_bridge");
+        }
+        try {
+            $transaction = $DB->start_delegated_transaction();
+            $tenant = $DB->get_record("local_ai_bridge_tenant", ["id" => $tenantid], "*", MUST_EXIST);
+            $user = $DB->get_record("local_ai_bridge_user",
+                ["tenantid" => $tenantid, "userid" => $userid], "*", MUST_EXIST);
+            if ($credits > 0) {
+                if (!$tenant->enabled || !$user->enabled) {
+                    throw new moodle_exception("error:userdisabled", "local_ai_bridge");
+                }
+                self::assert_available($tenant, $user, $credits);
+            }
+            $tenant->creditbalance = (float)$tenant->creditbalance - $credits;
+            $tenant->timemodified = time();
+            $DB->update_record("local_ai_bridge_tenant", $tenant);
+            $user->creditused = max(0, (float)$user->creditused + $credits);
+            $user->timemodified = time();
+            $DB->update_record("local_ai_bridge_user", $user);
+            $transaction->allow_commit();
+        } finally {
+            $lock->release();
+        }
+    }
+
+    /**
+     * Convert a previously charged reservation into a permanent ledger entry.
+     * This is called inside the same transaction as the successful usage record.
+     *
+     * @param int $tenantid Tenant.
+     * @param int $userid User.
+     * @param int $usageid Usage record.
+     * @param float $credits Already reserved cost.
+     * @return void
+     */
+    public static function record_reserved_usage(int $tenantid, int $userid, int $usageid, float $credits): void {
+        global $DB;
+        if ($credits <= 0) {
+            return;
+        }
+        $DB->insert_record("local_ai_bridge_credit", (object)[
+            "tenantid" => $tenantid,
+            "userid" => $userid,
+            "actorid" => null,
+            "usageid" => $usageid,
+            "amount" => -$credits,
+            "type" => "usage",
+            "note" => null,
+            "timecreated" => time(),
+        ]);
+    }
+
+    /**
      * Method debit.
      *
      * @param int $tenantid Parameter tenantid.
@@ -119,7 +211,7 @@ class credit_manager {
             $tenant->creditbalance = (float)$tenant->creditbalance + $amount;
             $tenant->timemodified = time();
             $DB->update_record('local_ai_bridge_tenant', $tenant);
-            $DB->insert_record('local_ai_bridge_credit', (object)[
+            $creditid = $DB->insert_record('local_ai_bridge_credit', (object)[
                 'tenantid' => $tenantid,
                 'userid' => null,
                 'actorid' => $actorid,
@@ -130,6 +222,11 @@ class credit_manager {
                 'timecreated' => time(),
             ]);
             $transaction->allow_commit();
+            \\local_ai_bridge\\event\\credit_adjusted::create([
+                "context" => \\context_system::instance(),
+                "objectid" => $creditid,
+                "other" => ["tenantid" => $tenantid, "amount" => $amount],
+            ])->trigger();
         } finally {
             $lock->release();
         }

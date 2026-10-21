@@ -58,6 +58,12 @@ if ($hassiteconfig) {
         0
     ));
     $settings->add(new admin_setting_configcheckbox(
+        "local_ai_bridge/disableai",
+        get_string("setting:disableai", "local_ai_bridge"),
+        get_string("setting:disableai_desc", "local_ai_bridge"),
+        0
+    ));
+    $settings->add(new admin_setting_configcheckbox(
         'local_ai_bridge/logfailures',
         get_string('setting:logfailures', 'local_ai_bridge'),
         get_string('setting:logfailures_desc', 'local_ai_bridge'),

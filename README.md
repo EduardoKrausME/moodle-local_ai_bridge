@@ -55,7 +55,9 @@ decimal number of credits per successful request, while each provider subplugin 
 monetary cost based on token prices configured in that connection.
 
 This separation avoids coupling tenant quotas to provider pricing changes. Tenant administrators can also set individual
-user credit limits.
+user credit limits. Credits are reserved under a tenant-wide lock **before** a paid provider call, shared among
+fallback routes, released on failure and finalized in the usage ledger after success. The site-wide `disableai`
+switch stops new generation and transcription requests, including queued requests at execution time.
 
 ## Security
 

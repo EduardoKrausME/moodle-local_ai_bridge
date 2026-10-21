@@ -57,6 +57,9 @@ class api {
         if ($userid !== (int)$USER->id && !has_capability("local/ai_bridge:manageall", $context, (int)$USER->id)) {
             throw new required_capability_exception($context, "local/ai_bridge:manageall", "nopermissions", "");
         }
+        if (get_config("local_ai_bridge", "disableai")) {
+            throw new moodle_exception("error:aicallsdisabled", "local_ai_bridge");
+        }
         if (!has_capability('local/ai_bridge:use', $context, $userid)) {
             throw new required_capability_exception($context, 'local/ai_bridge:use', 'nopermissions', '');
         }
@@ -85,7 +88,6 @@ class api {
         if (!$purpose) {
             throw new moodle_exception('error:purposeunavailable', 'local_ai_bridge', '', $purposeidnumber);
         }
-        credit_manager::assert_available($tenant, $usercontrol, (float)$purpose->creditcost);
         $routes = route_service::candidates((int)$tenant->id, (int)$purpose->id,
             $usercontrol->roleid ? (int)$usercontrol->roleid : null);
         if (!$routes) {
@@ -101,6 +103,10 @@ class api {
             $options
         );
         $request = $request->with_system_instruction((string)$purpose->systeminstruction);
+        $credits = (float)$purpose->creditcost;
+        credit_manager::reserve((int)$tenant->id, $userid, $credits);
+        $settled = false;
+        try {
         $last = null;
         foreach ($routes as $route) {
             $started = hrtime(true);
@@ -120,14 +126,20 @@ class api {
             $latency = (int)round((hrtime(true) - $started) / 1_000_000);
             $transaction = $DB->start_delegated_transaction();
             $usageid = usage_logger::success($tenant, $userid, $purpose, $usercontrol, $route, $response, $latency);
-            credit_manager::debit((int)$tenant->id, $userid, $usageid, (float)$purpose->creditcost);
+            credit_manager::record_reserved_usage((int)$tenant->id, $userid, $usageid, $credits);
             $transaction->allow_commit();
+            $settled = true;
             return $response;
         }
         if ($last instanceof moodle_exception) {
             throw $last;
         }
         throw new moodle_exception('error:allroutesfailed', 'local_ai_bridge');
+        } finally {
+            if (!$settled) {
+                credit_manager::release((int)$tenant->id, $userid, $credits);
+            }
+        }
     }
 
     /**
@@ -148,6 +160,9 @@ class api {
 
         $userid ??= (int)$USER->id;
         $context = context_system::instance();
+        if (get_config("local_ai_bridge", "disableai")) {
+            throw new moodle_exception("error:aicallsdisabled", "local_ai_bridge");
+        }
         if (!has_capability('local/ai_bridge:use', $context, $userid)) {
             throw new required_capability_exception($context, 'local/ai_bridge:use', 'nopermissions', '');
         }
@@ -173,13 +188,16 @@ class api {
         if (!$purpose) {
             throw new moodle_exception('error:purposeunavailable', 'local_ai_bridge', '', $purposeidnumber);
         }
-        credit_manager::assert_available($tenant, $usercontrol, (float)$purpose->creditcost);
         $routes = route_service::candidates((int)$tenant->id, (int)$purpose->id,
             $usercontrol->roleid ? (int)$usercontrol->roleid : null);
         if (!$routes) {
             throw new moodle_exception('error:noroute', 'local_ai_bridge');
         }
 
+        $credits = (float)$purpose->creditcost;
+        credit_manager::reserve((int)$tenant->id, $userid, $credits);
+        $settled = false;
+        try {
         $last = null;
         $supported = false;
         foreach ($routes as $route) {
@@ -204,8 +222,9 @@ class api {
             $latency = (int)round((hrtime(true) - $started) / 1_000_000);
             $transaction = $DB->start_delegated_transaction();
             $usageid = usage_logger::success($tenant, $userid, $purpose, $usercontrol, $route, $response, $latency);
-            credit_manager::debit((int)$tenant->id, $userid, $usageid, (float)$purpose->creditcost);
+            credit_manager::record_reserved_usage((int)$tenant->id, $userid, $usageid, $credits);
             $transaction->allow_commit();
+            $settled = true;
             return $response;
         }
         if (!$supported) {
@@ -215,6 +234,11 @@ class api {
             throw $last;
         }
         throw new moodle_exception('error:allroutesfailed', 'local_ai_bridge');
+        } finally {
+            if (!$settled) {
+                credit_manager::release((int)$tenant->id, $userid, $credits);
+            }
+        }
     }
 
     /**

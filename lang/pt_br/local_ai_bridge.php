@@ -144,3 +144,7 @@ $string["setting:allowcustomhosts"] = "Permitir hosts personalizados de provedor
 $string["setting:allowcustomhosts_desc"] = "Permite conexões de provedores hospedados a servidores personalizados. Apenas administradores do site podem alterar esta configuração.";
 $string["setting:allowprivatehosts"] = "Permitir destinos de rede privada";
 $string["setting:allowprivatehosts_desc"] = "Permite conexões a endereços de loopback, privados e link-local (inclusive Ollama local). Ative apenas com administradores confiáveis e controles de saída de rede.";
+
+$string["setting:disableai"] = "Desativar todas as chamadas de IA";
+$string["setting:disableai_desc"] = "Interruptor de emergência: rejeita novas solicitações de geração e transcrição.";
+$string["error:aicallsdisabled"] = "As solicitações de IA foram desativadas pelo administrador do site.";
