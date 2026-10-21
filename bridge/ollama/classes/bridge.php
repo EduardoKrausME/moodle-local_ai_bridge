@@ -135,7 +135,8 @@ class bridge implements provider_interface {
         if ($options) {
             $payload['options'] = $options;
         }
-        $payload = array_replace_recursive($payload, \local_ai_bridge\security\request_options::filter("ollama", $request->options));
+        $payload = array_replace_recursive($payload,
+            \local_ai_bridge\security\request_options::filter("ollama", $request->options));
         $headers = ['Content-Type: application/json'];
         if (!empty($config['apikey'])) {
             $headers[] = 'Authorization: Bearer ' . $config['apikey'];
@@ -149,7 +150,8 @@ class bridge implements provider_interface {
         $data = json_decode((string)$raw, true);
         if ($status < 200 || $status >= 300) {
             $message = is_array($data) ? (string)($data['error'] ?? 'HTTP ' . $status) : 'HTTP ' . $status;
-            throw new moodle_exception('error:request', 'aibridge_ollama', '', \local_ai_bridge\security\provider_error::safe($message));
+            throw new moodle_exception("error:request", "aibridge_ollama", "",
+                \local_ai_bridge\security\provider_error::safe($message));
         }
         if (!is_array($data) || !isset($data['message']['content'])) {
             throw new moodle_exception('error:response', 'aibridge_ollama');
