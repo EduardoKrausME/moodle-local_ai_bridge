@@ -48,4 +48,28 @@ final class privacy_provider_test extends advanced_testcase {
             $this->assertInstanceOf(external_location::class, reset($locations));
         }
     }
+
+    /**
+     * The four bridge components are compliant with privacy data requests and hold no local records.
+     *
+     * @coversNothing
+     */
+    public function test_bridge_providers_implement_data_request_interfaces(): void {
+        foreach (["openai", "claude", "gemini", "ollama"] as $name) {
+            $provider = "\\aibridge_" . $name . "\\privacy\\provider";
+
+            $this->assertTrue(is_subclass_of(
+                $provider,
+                \core_privacy\local\request\plugin\provider::class
+            ));
+            $this->assertTrue(is_subclass_of(
+                $provider,
+                \core_privacy\local\request\core_userlist_provider::class
+            ));
+
+            $contextlist = $provider::get_contexts_for_userid(1);
+            $this->assertInstanceOf(\core_privacy\local\request\contextlist::class, $contextlist);
+            $this->assertSame([], $contextlist->get_contextids());
+        }
+    }
 }
