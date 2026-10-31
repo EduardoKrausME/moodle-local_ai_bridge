@@ -22,7 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined("MOODLE_INTERNAL") || die();
+defined('MOODLE_INTERNAL') || die();
 
 $string['privacy:metadata:external'] = 'O endpoint Anthropic Claude ou compatível configurado recebe mensagens e instruções de sistema.';
 $string['privacy:metadata:external:messages'] = 'O texto das mensagens de usuários e assistentes é transmitido para geração.';
