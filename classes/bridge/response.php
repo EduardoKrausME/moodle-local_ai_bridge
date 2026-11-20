@@ -28,6 +28,27 @@ namespace local_ai_bridge\bridge;
  * Class response.
  */
 class response {
+    /** @var string Response text. */
+    public readonly string $text;
+
+    /** @var string Model name. */
+    public readonly string $model;
+
+    /** @var int Input tokens. */
+    public readonly int $inputtokens;
+
+    /** @var int Output tokens. */
+    public readonly int $outputtokens;
+
+    /** @var int Total tokens. */
+    public readonly int $totaltokens;
+
+    /** @var float Estimated cost. */
+    public readonly float $estimatedcost;
+
+    /** @var array Response metadata. */
+    public readonly array $metadata;
+
     /**
      * Method __construct.
      *
@@ -40,20 +61,20 @@ class response {
      * @param array $metadata Parameter metadata.
      */
     public function __construct(
-        /** @var string Response text. */
-        public readonly string $text,
-        /** @var string Model name. */
-        public readonly string $model,
-        /** @var int Input tokens. */
-        public readonly int $inputtokens = 0,
-        /** @var int Output tokens. */
-        public readonly int $outputtokens = 0,
-        /** @var int Total tokens. */
-        public readonly int $totaltokens = 0,
-        /** @var float Estimated cost. */
-        public readonly float $estimatedcost = 0.0,
-        /** @var array Response metadata. */
-        public readonly array $metadata = [],
+        string $text,
+        string $model,
+        int $inputtokens = 0,
+        int $outputtokens = 0,
+        int $totaltokens = 0,
+        float $estimatedcost = 0.0,
+        array $metadata = [],
     ) {
+        $this->text = $text;
+        $this->model = $model;
+        $this->inputtokens = $inputtokens;
+        $this->outputtokens = $outputtokens;
+        $this->totaltokens = $totaltokens;
+        $this->estimatedcost = $estimatedcost;
+        $this->metadata = $metadata;
     }
 }
