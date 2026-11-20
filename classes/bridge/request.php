@@ -28,6 +28,18 @@ namespace local_ai_bridge\bridge;
  * Class request.
  */
 class request {
+    /** @var array Messages. */
+    public readonly array $messages;
+
+    /** @var ?float Temperature. */
+    public readonly ?float $temperature;
+
+    /** @var ?int Maximum output tokens. */
+    public readonly ?int $maxoutputtokens;
+
+    /** @var array Additional options. */
+    public readonly array $options;
+
     /**
      * Method __construct.
      *
@@ -37,15 +49,15 @@ class request {
      * @param array $options Parameter options.
      */
     public function __construct(
-        /** @var array Messages. */
-        public readonly array $messages,
-        /** @var ?float Temperature. */
-        public readonly ?float $temperature = null,
-        /** @var ?int Maximum output tokens. */
-        public readonly ?int $maxoutputtokens = null,
-        /** @var array Additional options. */
-        public readonly array $options = [],
+        array $messages,
+        ?float $temperature = null,
+        ?int $maxoutputtokens = null,
+        array $options = [],
     ) {
+        $this->messages = $messages;
+        $this->temperature = $temperature;
+        $this->maxoutputtokens = $maxoutputtokens;
+        $this->options = $options;
     }
 
     /**
