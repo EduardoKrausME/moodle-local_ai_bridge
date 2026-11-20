@@ -7,10 +7,10 @@ routing and usage statistics while keeping all provider-specific behavior inside
 
 The parent plugin defines the subplugin type `aibridge`. Bundled providers are installed under `bridge/<name>`:
 
-- `aibridge_openai` — OpenAI Responses API and Chat Completions API;
-- `aibridge_gemini` — Google Gemini `generateContent` API;
-- `aibridge_claude` — Anthropic Claude Messages API;
-- `aibridge_ollama` — self-hosted Ollama `/api/chat` API.
+- `aibridge_openai` - OpenAI Responses API and Chat Completions API;
+- `aibridge_gemini` - Google Gemini `generateContent` API;
+- `aibridge_claude` - Anthropic Claude Messages API;
+- `aibridge_ollama` - self-hosted Ollama `/api/chat` API.
 
 The parent **does not contain provider-specific request logic**. Each bridge subplugin owns its configuration form,
 validation, authentication headers, request payload, HTTP call, response parsing, token accounting and provider cost
