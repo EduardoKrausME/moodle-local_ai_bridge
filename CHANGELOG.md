@@ -2,6 +2,14 @@
 
 This changelog covers **only the two most recent published GitHub releases** of `local_ai_bridge`. Each entry is grounded in the changes between its published release tag and the previous **published** release tag. The intermediate tag `1.2.1` has no published GitHub release and is therefore included in the comparison for `1.2.2`, rather than given its own entry.
 
+## 1.2.4 - 2026-11-21
+
+- Implemented GDPR request providers for the bundled OpenAI, Claude, Gemini and Ollama bridges, with regression tests.
+- Replaced constructor property promotion in bridge request and response classes for older PHP compatibility.
+- Added a security reporting policy and normalized documentation wording.
+
+**Comparison:** [1.2.3...1.2.4](https://github.com/EduardoKrausME/moodle-local_ai_bridge/compare/1.2.3...1.2.4)
+
 ## [1.2.3] - 2026-10-21
 
 Comparison: [1.2.2...1.2.3](https://github.com/EduardoKrausME/moodle-local_ai_bridge/compare/1.2.2...1.2.3)
